@@ -1,7 +1,6 @@
-package domain
+package entities
 
 import (
-	"fmt"
 	"time"
 )
 
@@ -14,9 +13,9 @@ const (
 )
 
 type StoreManager interface {
-	Add(key string, bucket *Bucket)
-	Delete(key string)
-	Get(key string) *Bucket
+	Add(key string, bucket *Bucket) error
+	Delete(key string) error
+	Get(key string) (*Bucket, error)
 }
 
 type Bucket struct {
@@ -27,7 +26,6 @@ type Bucket struct {
 // NewBucket with a callback chanel. The chanel send message for delete bucket from storage
 func NewBucket(marker int, duration time.Duration, key string, delete chan string) *Bucket {
 	time.AfterFunc(duration, func() {
-		fmt.Println("timeout")
 		delete <- key
 	})
 	return &Bucket{Marker: marker, Duration: duration}
