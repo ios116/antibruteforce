@@ -15,12 +15,12 @@ type BucketsManager interface {
 // Buckets содержет хранилище buckets, настройки для разного bucket type и канал для удаления неиспользуемых buckets по таймауту
 type Buckets struct {
 	Store    domain.StoreManager
-	Settings config.Settings
+	Settings *config.Settings
 	Callback chan string
 }
 
 // NewBuckets создание экземпляра buckets
-func NewBuckets(store domain.StoreManager, settings config.Settings) *Buckets {
+func NewBuckets(store domain.StoreManager, settings *config.Settings) *Buckets {
 	callback := make(chan string)
 	return &Buckets{Store: store, Settings: settings, Callback: callback}
 }

@@ -5,27 +5,34 @@ import (
 	"sync"
 )
 
-
-
+// BucketStore
 type BucketStore struct {
 	sync.Mutex
-	Login map[string]*domain.Bucket
+	Elements map[string]*domain.Bucket
 }
 
+func NewBucketStore() *BucketStore {
+	return &BucketStore{Elements: make(map[string]*domain.Bucket)}
+}
+
+// Add bucket with key
 func (st *BucketStore) Add(key string, bucket *domain.Bucket) {
 	st.Lock()
-	st.Login[key] = bucket
+	st.Elements[key] = bucket
 	st.Unlock()
 }
 
+// Delete bucket by key
 func (st *BucketStore) Delete(key string) {
 	st.Lock()
-	delete(st.Login, key)
+	delete(st.Elements, key)
 	st.Unlock()
 }
+
+// Get bucket by key
 func (st *BucketStore) Get(key string) *domain.Bucket {
 	st.Lock()
-	bk, ok := st.Login[key]
+	bk, ok := st.Elements[key]
 	if !ok {
 		return nil
 	}

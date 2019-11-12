@@ -2,7 +2,6 @@ package domain
 
 import (
 	"fmt"
-	"log"
 	"time"
 )
 
@@ -25,6 +24,7 @@ type Bucket struct {
 	Duration time.Duration
 }
 
+// NewBucket with a callback chanel. The chanel send message for delete bucket from storage
 func NewBucket(marker int, duration time.Duration, key string, delete chan string) *Bucket {
 	time.AfterFunc(duration, func() {
 		fmt.Println("timeout")
@@ -33,11 +33,11 @@ func NewBucket(marker int, duration time.Duration, key string, delete chan strin
 	return &Bucket{Marker: marker, Duration: duration}
 }
 
+// Counter subtract one from bucket marker
 func (b *Bucket) Counter() bool {
 	b.Marker -= 1
-	log.Println("marker remainder", b.Marker)
 	if b.Marker < 0 {
-		log.Println("marker is finished")
+		b.Marker = 0
 		return false
 	}
 	return true

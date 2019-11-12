@@ -4,6 +4,7 @@ import (
 	"github.com/caarlos0/env/v6"
 	"log"
 )
+
 type Settings struct {
 	LoginN    int   `env:"LoginN" envDefault:"10"`
 	PasswordM int   `env:"PASSWORD_M" envDefault:"100"`

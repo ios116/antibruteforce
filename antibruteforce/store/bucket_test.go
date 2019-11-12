@@ -1,7 +1,7 @@
 package store
 
 import (
-     "testing"
+	"testing"
 )
 
 func TestCreate(t *testing.T) {
