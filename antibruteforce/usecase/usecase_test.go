@@ -67,8 +67,8 @@ func TestGet(t *testing.T) {
 		}
 	})
 
-	t.Run("Add bucket with login type", func(t *testing.T) {
-		_, err := bucketsUseCase.Add("admin", entities.Login)
+	t.Run("Add bucket with login type and set value admin to login", func(t *testing.T) {
+		_, err = bucketsUseCase.Add("admin", entities.Login)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -93,7 +93,7 @@ func TestGet(t *testing.T) {
 
 	t.Run("Check available request if not enough markers", func(t *testing.T) {
 		status, err := bucketsUseCase.Check(bucket)
-		if err == nil {
+		if err != nil {
 			t.Fatal(err)
 		}
 		if status {
@@ -105,7 +105,6 @@ func TestGet(t *testing.T) {
 	ctx:=context.Background()
 	go bucketsUseCase.BucketCollector(ctx)
 	time.Sleep(time.Second * 4)
-
 	t.Run("Check for bucket removal after the expiration of a lifetime", func(t *testing.T) {
 		_, err = bucketsUseCase.Get("admin")
 		if err == nil {
