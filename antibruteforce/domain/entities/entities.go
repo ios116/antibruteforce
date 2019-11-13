@@ -4,18 +4,27 @@ import (
 	"time"
 )
 
-type Kind int
+type Kind string
 
 const (
-	Login Kind = iota
-	Password
-	Ip
+	Login    Kind = "login"
+	Password      = "password"
+	Ip            = "ip"
 )
 
+type Hash struct {
+	Kind Kind
+	Key string
+}
+
+func NewHash(kind Kind, key string) *Hash {
+	return &Hash{Kind: kind, Key: key}
+}
+
 type StoreManager interface {
-	Add(key string, bucket *Bucket) error
-	Delete(key string) error
-	Get(key string) (*Bucket, error)
+	Add(key *Hash, bucket *Bucket) error
+	Delete(hash *Hash) error
+	Get(key *Hash) (*Bucket, error)
 }
 
 type Bucket struct {
@@ -24,12 +33,20 @@ type Bucket struct {
 }
 
 // NewBucket with a callback chanel. The chanel send message for delete bucket from storage
-func NewBucket(marker int, duration time.Duration, key string, delete chan string) *Bucket {
+func NewBucket(marker int, duration time.Duration, hash *Hash, callback chan *Hash) *Bucket {
 	time.AfterFunc(duration, func() {
-		delete <- key
+		callback <- hash
 	})
 	return &Bucket{Marker: marker, Duration: duration}
 }
+
+//func (b *Bucket) CreateKey(key string, kind Kind) string {
+//	var buffer bytes.Buffer
+//	buffer.WriteString(key)
+//	buffer.WriteRune(':')
+//	buffer.WriteString(string(kind))
+//	return buffer.String()
+//}
 
 // Counter subtract one from bucket marker
 func (b *Bucket) Counter() bool {

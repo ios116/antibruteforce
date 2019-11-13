@@ -18,46 +18,45 @@ type BucketsManager interface {
 type Buckets struct {
 	Store    entities.StoreManager
 	Settings *config.Settings
-	Callback chan string
+	Callback chan *entities.Hash
 }
 
 // NewBuckets создание экземпляра buckets
 func NewBuckets(store entities.StoreManager, settings *config.Settings) *Buckets {
-	callback := make(chan string)
+	callback := make(chan *entities.Hash)
 	return &Buckets{Store: store, Settings: settings, Callback: callback}
 }
 
-func (b *Buckets) Get(key string) (*entities.Bucket, error) {
-	if key == "" {
+func (b *Buckets) Get(hash *entities.Hash) (*entities.Bucket, error) {
+	if hash == nil {
 		return nil, exceptions.KeyRequired
 	}
 	var bucket *entities.Bucket
-	bucket, err := b.Store.Get(key)
+	bucket, err := b.Store.Get(hash)
 	if err != nil {
 		return nil, err
 	}
 	return bucket, nil
 }
 
-func (b *Buckets) Add(key string, kind entities.Kind) (*entities.Bucket, error) {
-	if key == "" {
+func (b *Buckets) Add(hash *entities.Hash) (*entities.Bucket, error) {
+	if hash == nil {
 		return nil, exceptions.KeyRequired
 	}
 	var bucket *entities.Bucket
 	duration := time.Second * time.Duration(b.Settings.Duration)
-	switch kind {
+
+	switch hash.Kind {
 	case entities.Login:
-		bucket = entities.NewBucket(b.Settings.LoginN, duration, key, b.Callback)
+		bucket = entities.NewBucket(b.Settings.LoginRequests, duration, hash, b.Callback)
 	case entities.Password:
-		bucket = entities.NewBucket(b.Settings.PasswordM, duration, key, b.Callback)
+		bucket = entities.NewBucket(b.Settings.PasswordRequests, duration, hash, b.Callback)
 	case entities.Ip:
-		bucket = entities.NewBucket(b.Settings.IpK, duration, key, b.Callback)
+		bucket = entities.NewBucket(b.Settings.IpRequests, duration, hash, b.Callback)
 	default:
 		return nil, exceptions.TypeNotFound
 	}
-
-	err := b.Store.Add(key, bucket)
-
+	err := b.Store.Add(hash, bucket)
 	if err != nil {
 		return nil, err
 	}
@@ -76,8 +75,8 @@ func (b *Buckets) Check(bucket *entities.Bucket) (bool, error) {
 func (b *Buckets) BucketCollector(ctx context.Context) {
 	for {
 		select {
-		case key := <-b.Callback:
-			b.Store.Delete(key)
+		case hash := <-b.Callback:
+			b.Store.Delete(hash)
 		case <-ctx.Done():
 			return
 		}

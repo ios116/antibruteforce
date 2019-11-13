@@ -3,7 +3,7 @@ package usecase
 import (
 	"antibruteforce/config"
 	"antibruteforce/domain/entities"
-	"antibruteforce/store"
+	"antibruteforce/store/bucketstore"
 	"context"
 	"github.com/stretchr/testify/mock"
 	"testing"
@@ -42,40 +42,42 @@ func TestGet(t *testing.T) {
 	//
 	//t.Run("Created bucket", func(t *testing.T) {
 	//	duration := time.Second * time.Duration(bucketsUseCase.Settings.Duration)
-	//	bucket := entities.NewBucket(bucketsUseCase.Settings.LoginN, duration, "admin", bucketsUseCase.Callback)
+	//	bucket := entities.NewBucket(bucketsUseCase.Settings.LoginRequests, duration, "admin", bucketsUseCase.Callback)
 	//    testObj.On("Add","admin",bucket).Return(nil)
 	//    bucket,err:= bucketsUseCase.Add("admin",entities.Login)
 	//    t.Log(bucket, err)
 	//})
 
 	// Create bucket store
-	bucketStore := store.NewBucketStore()
+	bucketStore := bucketstore.NewBucketStore()
 	// Create settings
 	settings := config.NewSettings()
 	// set 1 request in 3 seconds to login
 	settings.Duration = 3
-	settings.LoginN = 1
+	settings.LoginRequests = 1
 	// Create buckets use case
 	bucketsUseCase := NewBuckets(bucketStore, settings)
 	var bucket *entities.Bucket
 	var err error
 
+	hash:= entities.NewHash(entities.Login,"admin")
+
 	t.Run("Get bucket if not exist", func(t *testing.T) {
-		_, err = bucketsUseCase.Get("login")
+		_, err = bucketsUseCase.Get(hash)
 		if err == nil {
 			t.Fatal("bucket must be nil")
 		}
 	})
 
 	t.Run("Add bucket with login type and set value admin to login", func(t *testing.T) {
-		_, err = bucketsUseCase.Add("admin", entities.Login)
+		_, err = bucketsUseCase.Add(hash)
 		if err != nil {
 			t.Fatal(err)
 		}
 	})
 
 	t.Run("Checking the presence of a bucket after adding", func(t *testing.T) {
-		bucket, err = bucketsUseCase.Get("admin")
+		bucket, err = bucketsUseCase.Get(hash)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -102,11 +104,11 @@ func TestGet(t *testing.T) {
 	})
 
 	// Running collector of buckets
-	ctx:=context.Background()
+	ctx := context.Background()
 	go bucketsUseCase.BucketCollector(ctx)
 	time.Sleep(time.Second * 4)
 	t.Run("Check for bucket removal after the expiration of a lifetime", func(t *testing.T) {
-		_, err = bucketsUseCase.Get("admin")
+		_, err = bucketsUseCase.Get(hash)
 		if err == nil {
 			t.Fatal("bucket must be nil")
 		}
