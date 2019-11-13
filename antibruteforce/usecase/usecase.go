@@ -4,6 +4,7 @@ import (
 	"antibruteforce/config"
 	"antibruteforce/domain/entities"
 	"antibruteforce/domain/exceptions"
+	"context"
 	"time"
 )
 
@@ -54,7 +55,9 @@ func (b *Buckets) Add(key string, kind entities.Kind) (*entities.Bucket, error) 
 	default:
 		return nil, exceptions.TypeNotFound
 	}
+
 	err := b.Store.Add(key, bucket)
+
 	if err != nil {
 		return nil, err
 	}
@@ -70,9 +73,13 @@ func (b *Buckets) Check(bucket *entities.Bucket) (bool, error) {
 }
 
 // DeleteBucket дуаление устаревшего bucket по таймауту, в канал отправляется  bucket's key
-func (b *Buckets) BucketCollector(key string) {
+func (b *Buckets) BucketCollector(ctx context.Context) {
 	for {
-		key := <-b.Callback
-		b.Store.Delete(key)
+		select {
+		case key := <-b.Callback:
+			b.Store.Delete(key)
+		case <-ctx.Done():
+			return
+		}
 	}
 }

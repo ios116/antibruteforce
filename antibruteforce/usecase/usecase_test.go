@@ -3,7 +3,8 @@ package usecase
 import (
 	"antibruteforce/config"
 	"antibruteforce/domain/entities"
-	"antibruteforce/domain/exceptions"
+	"antibruteforce/store"
+	"context"
 	"github.com/stretchr/testify/mock"
 	"testing"
 	"time"
@@ -28,50 +29,87 @@ func (s *MockedBucketStore) Get(key string) (*entities.Bucket, error) {
 
 func TestGet(t *testing.T) {
 
-	testObj := new(MockedBucketStore)
+	//testObj := new(MockedBucketStore)
+	//settings := config.NewSettings()
+	//bucketsUseCase := NewBuckets(testObj, settings)
+	//t.Run("Get bucket", func(t *testing.T) {
+	//	testObj.On("Get", "admin").Return(&entities.Bucket{}, exceptions.BucketsNil)
+	//	_, err := bucketsUseCase.Get("admin")
+	//	if err == nil {
+	//		t.Fatal("bucket not created yet")
+	//	}
+	//})
+	//
+	//t.Run("Created bucket", func(t *testing.T) {
+	//	duration := time.Second * time.Duration(bucketsUseCase.Settings.Duration)
+	//	bucket := entities.NewBucket(bucketsUseCase.Settings.LoginN, duration, "admin", bucketsUseCase.Callback)
+	//    testObj.On("Add","admin",bucket).Return(nil)
+	//    bucket,err:= bucketsUseCase.Add("admin",entities.Login)
+	//    t.Log(bucket, err)
+	//})
+
+	// Create bucket store
+	bucketStore := store.NewBucketStore()
+	// Create settings
 	settings := config.NewSettings()
-	bucketsUseCase := NewBuckets(testObj, settings)
-	t.Run("Get bucket", func(t *testing.T) {
-		testObj.On("Get", "admin").Return(&entities.Bucket{}, exceptions.BucketsNil)
-		_, err := bucketsUseCase.Get("admin")
+	// set 1 request in 3 seconds to login
+	settings.Duration = 3
+	settings.LoginN = 1
+	// Create buckets use case
+	bucketsUseCase := NewBuckets(bucketStore, settings)
+	var bucket *entities.Bucket
+	var err error
+
+	t.Run("Get bucket if not exist", func(t *testing.T) {
+		_, err = bucketsUseCase.Get("login")
 		if err == nil {
-			t.Fatal("bucket not created yet")
+			t.Fatal("bucket must be nil")
 		}
 	})
 
-	t.Run("Created bucket", func(t *testing.T) {
-		duration := time.Second * time.Duration(bucketsUseCase.Settings.Duration)
-		bucket := entities.NewBucket(bucketsUseCase.Settings.LoginN, duration, "admin", bucketsUseCase.Callback)
-        testObj.On("Add","admin",bucket).Return(nil)
-        bucket,err:= bucketsUseCase.Add("admin",entities.Login)
-        t.Log(bucket, err)
+	t.Run("Add bucket with login type", func(t *testing.T) {
+		_, err := bucketsUseCase.Add("admin", entities.Login)
+		if err != nil {
+			t.Fatal(err)
+		}
 	})
 
-	// status, _:=bucketsUseCase.Check(bucket)
+	t.Run("Checking the presence of a bucket after adding", func(t *testing.T) {
+		bucket, err = bucketsUseCase.Get("admin")
+		if err != nil {
+			t.Fatal(err)
+		}
+	})
 
-	//if !status {
-	//	t.Log("status must be true because markers are enough")
-	//}
+	t.Run("Check available request if enough markers", func(t *testing.T) {
+		status, err := bucketsUseCase.Check(bucket)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if !status {
+			t.Fatal("Status must be true because there are enough markers")
+		}
+	})
 
-	//if status {
-	//	t.Log("status must be false because markers are over")
-	//}
-	//
-	//
-	//testObj.On("Get", "admin").Return(bucket)
-	//
-	//status := bucketsUseCase.Check("admin", entities.Login)
-	//
-	//bucket.Marker = 10
-	//status = bucketsUseCase.Check("admin", entities.Login)
-	//
-	//if bucket.Marker != 9 {
-	//	t.Log("marker must be 9 because subtract 1 from 10")
-	//}
-	//
-	//
-	//status = bucketsUseCase.Check("admin", entities.Login)
-	//
-	//
+	t.Run("Check available request if not enough markers", func(t *testing.T) {
+		status, err := bucketsUseCase.Check(bucket)
+		if err == nil {
+			t.Fatal(err)
+		}
+		if status {
+			t.Fatal("Status must be false because there are not enough markers")
+		}
+	})
 
+	// Running collector of buckets
+	ctx:=context.Background()
+	go bucketsUseCase.BucketCollector(ctx)
+	time.Sleep(time.Second * 4)
+
+	t.Run("Check for bucket removal after the expiration of a lifetime", func(t *testing.T) {
+		_, err = bucketsUseCase.Get("admin")
+		if err == nil {
+			t.Fatal("bucket must be nil")
+		}
+	})
 }
