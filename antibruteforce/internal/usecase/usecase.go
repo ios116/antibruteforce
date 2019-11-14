@@ -5,15 +5,23 @@ import (
 	"antibruteforce/internal/domain/entities"
 	"antibruteforce/internal/domain/exceptions"
 	"context"
+	"net"
 	"time"
 )
 
 // BucketsManager интерфейс позводляющий проверить наличие свободных маркеров и удалить устаревший bucket
 type BucketsManager interface {
+	// for buckets
 	GetBucketByHash(hash *entities.Hash) (*entities.Bucket, error)
 	CreateBucket(hash *entities.Hash) (*entities.Bucket, error)
 	CheckBucket(bucket *entities.Bucket) (bool, error)
 	BucketCollector(ctx context.Context)
+    // for ip
+	AddIpToList(ctx context.Context, ip *entities.IPItem) error
+	DeleteByIP(ctx context.Context, ip *net.IPNet) error
+	GetByIP(ctx context.Context, ip *net.IPNet) (*entities.IPItem, error)
+    // for request
+	CheckRequest(request entities.Request) (bool, error)
 }
 
 // BucketUseCase содержет хранилище buckets, настройки для разного bucket type и канал для удаления неиспользуемых buckets по таймауту
@@ -73,7 +81,10 @@ func (b *BucketUseCase) CheckBucket(bucket *entities.Bucket) (bool, error) {
 	if bucket == nil {
 		return false, exceptions.NilValue
 	}
-	return bucket.Counter(), nil
+	if !bucket.Counter() {
+		return false, exceptions.LimitReached
+	}
+	return true, nil
 }
 
 // BucketCollector удаление устаревшего bucket по таймауту, в канал отправляется  bucket's hash
@@ -86,4 +97,38 @@ func (b *BucketUseCase) BucketCollector(ctx context.Context) {
 			return
 		}
 	}
+}
+
+// AddIpToList adding to ip to list
+func (b *BucketUseCase) AddIpToList(ctx context.Context, ip *entities.IPItem) error {
+    return b.IPStore.Add(ctx, ip)
+}
+// DeleteByIP delete ip from list
+func (b *BucketUseCase) DeleteByIP(ctx context.Context, ip *net.IPNet) error {
+	return b.IPStore.DeleteByIP(ctx, ip)
+}
+
+// GetByIP
+func (b *BucketUseCase) GetByIP(ctx context.Context, ip *net.IPNet) (*entities.IPItem, error) {
+    return b.IPStore.GetByIP(ctx,ip)
+}
+
+func (b *BucketUseCase) CheckRequest(request *entities.Request) (bool, error) {
+	if err := request.Validation(); err !=nil {
+		return false, err
+	}
+	//ctx := context.Background()
+	loginHash := entities.NewHash(entities.Login,request.Login)
+	//passwordHash := entities.NewHash(entities.Password,request.Password)
+	//loginHash := entities.NewHash(entities.Login,request.IP.String())
+	//TODO: check ip from blacklist
+    bucket, err := b.GetBucketByHash(loginHash)
+    if err == nil {
+        bucket, err =b.CreateBucket(loginHash)
+        if err != nil {
+        	return false, err
+		}
+	}
+    status, err :=b.CheckBucket(bucket)
+    return status, err
 }

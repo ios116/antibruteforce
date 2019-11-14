@@ -9,8 +9,12 @@ func (ee DomainError) Error() string {
 }
 
 var (
-	NilValue        = DomainError("Value is nil")
-	KeyRequired     = DomainError("Key is required")
-	TypeNotFound    = DomainError("Type not found")
-	ObjectNoteFound = DomainError("Object not found")
+	NilValue         = DomainError("Value is nil")
+	KeyRequired      = DomainError("Key is required")
+	TypeNotFound     = DomainError("Type not found")
+	ObjectNoteFound  = DomainError("Object not found")
+	IPRequired       = DomainError("Ip address is required")
+	LoginRequired    = DomainError("Login address is required")
+	PasswordRequired = DomainError("Password address is required")
+	LimitReached = DomainError("Request limit has been reached")
 )
