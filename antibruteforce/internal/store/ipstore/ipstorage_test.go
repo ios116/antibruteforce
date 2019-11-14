@@ -31,20 +31,20 @@ func TestDbRepo_Add(t *testing.T) {
 	repo := NewDbRepo(db)
 	ctx := context.Background()
 
-	ip := &entities.IPList{
+	ip := &entities.IPItem{
 		Kind:        entities.Black,
 		IP:          ipv4Net,
 		DateCreated: time.Time{},
 	}
 
-	t.Run("add Ip", func(t *testing.T) {
+	t.Run("add IP", func(t *testing.T) {
 		err = repo.Add(ctx, ip)
 		if err != nil {
 			t.Fatal(err)
 		}
 	})
 
-	t.Run("Get by ip", func(t *testing.T) {
+	t.Run("GetBucketByHash by ip", func(t *testing.T) {
 		result, err := repo.GetByIP(ctx, ipv4Net)
 		if err != nil {
 			t.Fatal(err)
@@ -56,7 +56,7 @@ func TestDbRepo_Add(t *testing.T) {
 	})
 
 	t.Run("Delete by ip", func(t *testing.T) {
-		err = repo.DeleteByIp(ctx, ipv4Net)
+		err = repo.DeleteByIP(ctx, ipv4Net)
 		if err != nil {
 			t.Fatal(err)
 		}

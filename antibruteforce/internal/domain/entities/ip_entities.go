@@ -6,22 +6,25 @@ import (
 	"time"
 )
 
-type KindIp string
+// IPKind may by black(IP is blocked) or white(IP is approved)
+type IPKind string
 
 const (
-	Black KindIp = "black"
+	Black IPKind = "black"
 	White        = "white"
 )
 
-type IPList struct {
+// IPItem ip item
+type IPItem struct {
 	ID          int64
-	Kind        KindIp
+	Kind        IPKind
 	IP          *net.IPNet
 	DateCreated time.Time
 }
 
-type IPManager interface {
-	Add(ctx context.Context, list *IPList) error
-	DeleteByIp(ctx context.Context, ip *net.IPNet) error
-	GetByIP(ctx context.Context, ip *net.IPNet) (*IPList, error)
+// IPStoreManager is interface for ips storage
+type IPStoreManager interface {
+	Add(ctx context.Context, list *IPItem) error
+	DeleteByIP(ctx context.Context, ip *net.IPNet) error
+	GetByIP(ctx context.Context, ip *net.IPNet) (*IPItem, error)
 }

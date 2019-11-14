@@ -6,11 +6,12 @@ package grpcserver
 import (
 	context "context"
 	fmt "fmt"
+	math "math"
+
 	proto "github.com/golang/protobuf/proto"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
-	math "math"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -178,7 +179,7 @@ func NewAntiBruteForceClient(cc *grpc.ClientConn) AntiBruteForceClient {
 
 func (c *antiBruteForceClient) Check(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error) {
 	out := new(Response)
-	err := c.cc.Invoke(ctx, "/grpcserver.AntiBruteForce/Check", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/grpcserver.AntiBruteForce/CheckBucket", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -195,7 +196,7 @@ type UnimplementedAntiBruteForceServer struct {
 }
 
 func (*UnimplementedAntiBruteForceServer) Check(ctx context.Context, req *Request) (*Response, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Check not implemented")
+	return nil, status.Errorf(codes.Unimplemented, "method CheckBucket not implemented")
 }
 
 func RegisterAntiBruteForceServer(s *grpc.Server, srv AntiBruteForceServer) {
@@ -212,7 +213,7 @@ func _AntiBruteForce_Check_Handler(srv interface{}, ctx context.Context, dec fun
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/grpcserver.AntiBruteForce/Check",
+		FullMethod: "/grpcserver.AntiBruteForce/CheckBucket",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AntiBruteForceServer).Check(ctx, req.(*Request))
@@ -225,7 +226,7 @@ var _AntiBruteForce_serviceDesc = grpc.ServiceDesc{
 	HandlerType: (*AntiBruteForceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "Check",
+			MethodName: "CheckBucket",
 			Handler:    _AntiBruteForce_Check_Handler,
 		},
 	},

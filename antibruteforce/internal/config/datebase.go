@@ -2,9 +2,10 @@ package config
 
 import (
 	"fmt"
+	"log"
+
 	"github.com/caarlos0/env/v6"
 	"github.com/jmoiron/sqlx"
-	"log"
 )
 
 // DateBaseConf config
@@ -15,6 +16,7 @@ type DateBaseConf struct {
 	BdName     string `env:"PGDATABASE" envDefault:"force"`
 }
 
+// NewDateBaseConf parsing env
 func NewDateBaseConf() *DateBaseConf {
 	c := &DateBaseConf{}
 	if err := env.Parse(c); err != nil {

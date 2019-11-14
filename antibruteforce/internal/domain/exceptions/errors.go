@@ -1,7 +1,9 @@
 package exceptions
 
+// DomainError common errors
 type DomainError string
 
+// Error implementation error interface
 func (ee DomainError) Error() string {
 	return string(ee)
 }

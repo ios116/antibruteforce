@@ -5,9 +5,10 @@ import (
 	"antibruteforce/internal/domain/entities"
 	"antibruteforce/internal/store/bucketstore"
 	"context"
-	"github.com/stretchr/testify/mock"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/mock"
 )
 
 type MockedBucketStore struct {
@@ -32,9 +33,9 @@ func TestGet(t *testing.T) {
 	//testObj := new(MockedBucketStore)
 	//settings := config.NewSettings()
 	//bucketsUseCase := NewBuckets(testObj, settings)
-	//t.Run("Get bucket", func(t *testing.T) {
-	//	testObj.On("Get", "admin").Return(&entities.Bucket{}, exceptions.BucketsNil)
-	//	_, err := bucketsUseCase.Get("admin")
+	//t.Run("GetBucketByHash bucket", func(t *testing.T) {
+	//	testObj.On("GetBucketByHash", "admin").Return(&entities.Bucket{}, exceptions.BucketsNil)
+	//	_, err := bucketsUseCase.GetBucketByHash("admin")
 	//	if err == nil {
 	//		t.Fatal("bucket not created yet")
 	//	}
@@ -43,8 +44,8 @@ func TestGet(t *testing.T) {
 	//t.Run("Created bucket", func(t *testing.T) {
 	//	duration := time.Second * time.Duration(bucketsUseCase.Settings.Duration)
 	//	bucket := entities.NewBucket(bucketsUseCase.Settings.LoginRequests, duration, "admin", bucketsUseCase.Callback)
-	//    testObj.On("Add","admin",bucket).Return(nil)
-	//    bucket,err:= bucketsUseCase.Add("admin",entities.Login)
+	//    testObj.On("CreateBucket","admin",bucket).Return(nil)
+	//    bucket,err:= bucketsUseCase.CreateBucket("admin",entities.Login)
 	//    t.Log(bucket, err)
 	//})
 
@@ -62,29 +63,29 @@ func TestGet(t *testing.T) {
 
 	hash := entities.NewHash(entities.Login, "admin")
 
-	t.Run("Get bucket if not exist", func(t *testing.T) {
-		_, err = bucketsUseCase.Get(hash)
+	t.Run("GetBucketByHash bucket if not exist", func(t *testing.T) {
+		_, err = bucketsUseCase.GetBucketByHash(hash)
 		if err == nil {
 			t.Fatal("bucket must be nil")
 		}
 	})
 
-	t.Run("Add bucket with login type and set value admin to login", func(t *testing.T) {
-		_, err = bucketsUseCase.Add(hash)
+	t.Run("CreateBucket bucket with login type and set value admin to login", func(t *testing.T) {
+		_, err = bucketsUseCase.CreateBucket(hash)
 		if err != nil {
 			t.Fatal(err)
 		}
 	})
 
 	t.Run("Checking the presence of a bucket after adding", func(t *testing.T) {
-		bucket, err = bucketsUseCase.Get(hash)
+		bucket, err = bucketsUseCase.GetBucketByHash(hash)
 		if err != nil {
 			t.Fatal(err)
 		}
 	})
 
-	t.Run("Check available request if enough markers", func(t *testing.T) {
-		status, err := bucketsUseCase.Check(bucket)
+	t.Run("CheckBucket available request if enough markers", func(t *testing.T) {
+		status, err := bucketsUseCase.CheckBucket(bucket)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -93,8 +94,8 @@ func TestGet(t *testing.T) {
 		}
 	})
 
-	t.Run("Check available request if not enough markers", func(t *testing.T) {
-		status, err := bucketsUseCase.Check(bucket)
+	t.Run("CheckBucket available request if not enough markers", func(t *testing.T) {
+		status, err := bucketsUseCase.CheckBucket(bucket)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -107,8 +108,8 @@ func TestGet(t *testing.T) {
 	ctx := context.Background()
 	go bucketsUseCase.BucketCollector(ctx)
 	time.Sleep(time.Second * 4)
-	t.Run("Check for bucket removal after the expiration of a lifetime", func(t *testing.T) {
-		_, err = bucketsUseCase.Get(hash)
+	t.Run("CheckBucket for bucket removal after the expiration of a lifetime", func(t *testing.T) {
+		_, err = bucketsUseCase.GetBucketByHash(hash)
 		if err == nil {
 			t.Fatal("bucket must be nil")
 		}

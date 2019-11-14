@@ -12,6 +12,7 @@ type BucketStore struct {
 	Buckets map[*entities.Hash]*entities.Bucket
 }
 
+// NewBucketStore create bucket storage storage
 func NewBucketStore() *BucketStore {
 	return &BucketStore{Buckets: make(map[*entities.Hash]*entities.Bucket)}
 }
