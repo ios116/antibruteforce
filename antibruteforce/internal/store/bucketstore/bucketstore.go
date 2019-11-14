@@ -1,8 +1,8 @@
 package bucketstore
 
 import (
-	"antibruteforce/domain/entities"
-	"antibruteforce/domain/exceptions"
+	"antibruteforce/internal/domain/entities"
+	"antibruteforce/internal/domain/exceptions"
 	"sync"
 )
 
@@ -27,7 +27,7 @@ func (st *BucketStore) Add(hash *entities.Hash, bucket *entities.Bucket) error {
 // Delete bucket by key
 func (st *BucketStore) Delete(hash *entities.Hash) error {
 	st.mux.Lock()
-	delete(st.Buckets,hash)
+	delete(st.Buckets, hash)
 	st.mux.Unlock()
 	return nil
 }
@@ -38,7 +38,7 @@ func (st *BucketStore) Get(hash *entities.Hash) (*entities.Bucket, error) {
 	defer st.mux.Unlock()
 	bk, ok := st.Buckets[hash]
 	if !ok {
-		return nil, exceptions.BucketsNil
+		return nil, exceptions.NilValue
 	}
 	return bk, nil
 }

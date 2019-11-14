@@ -1,0 +1,19 @@
+version: '3'
+services:
+
+  db:
+    image: postgres:11.2
+    container_name: postgres
+    environment:
+      POSTGRES_PASSWORD: 123456
+      POSTGRES_USER: postgres
+      POSTGRES_DB: force
+    networks:
+      - net
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./antibruteforce/sql/setup.sql:/docker-entrypoint-initdb.d/setup.sql
+networks:
+  net:
+    driver: bridge

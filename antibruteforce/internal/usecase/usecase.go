@@ -1,16 +1,16 @@
 package usecase
 
 import (
-	"antibruteforce/config"
-	"antibruteforce/domain/entities"
-	"antibruteforce/domain/exceptions"
+	"antibruteforce/internal/config"
+	"antibruteforce/internal/domain/entities"
+	"antibruteforce/internal/domain/exceptions"
 	"context"
 	"time"
 )
 
 // Manager интерфейс позводляющий проверить наличие свободных маркеров и удалить устаревший bucket
 type BucketsManager interface {
-	Check(key string, kind entities.Kind) bool
+	Check(key string, kind entities.KindBucket) bool
 	DeleteBucket(key string)
 }
 
@@ -66,7 +66,7 @@ func (b *Buckets) Add(hash *entities.Hash) (*entities.Bucket, error) {
 // Check проверка есть ли доступные markers.
 func (b *Buckets) Check(bucket *entities.Bucket) (bool, error) {
 	if bucket == nil {
-		return false, exceptions.BucketsNil
+		return false, exceptions.NilValue
 	}
 	return bucket.Counter(), nil
 }

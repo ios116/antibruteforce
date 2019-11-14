@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+package grpcserver;
+option go_package = "/internal/grpcserver";
+
+// Request with ip, login , password
+message Request {
+    string Login = 1;
+    string Password = 2;
+    string Ip = 3;
+    google.protobuf.Timestamp date = 4;
+}
+
+// Response with status and detail message
+message Response {
+    bool Status = 1;
+    string Detail = 2;
+}
+
+service AntiBruteForce {
+    rpc Check (Request) returns (Response){};
+}

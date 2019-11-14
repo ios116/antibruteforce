@@ -1,9 +1,9 @@
 package usecase
 
 import (
-	"antibruteforce/config"
-	"antibruteforce/domain/entities"
-	"antibruteforce/store/bucketstore"
+	"antibruteforce/internal/config"
+	"antibruteforce/internal/domain/entities"
+	"antibruteforce/internal/store/bucketstore"
 	"context"
 	"github.com/stretchr/testify/mock"
 	"testing"
@@ -60,7 +60,7 @@ func TestGet(t *testing.T) {
 	var bucket *entities.Bucket
 	var err error
 
-	hash:= entities.NewHash(entities.Login,"admin")
+	hash := entities.NewHash(entities.Login, "admin")
 
 	t.Run("Get bucket if not exist", func(t *testing.T) {
 		_, err = bucketsUseCase.Get(hash)
