@@ -12,6 +12,7 @@ require (
 	github.com/jmoiron/sqlx v1.2.0
 	github.com/pkg/errors v0.8.1 // indirect
 	github.com/shopspring/decimal v0.0.0-20191009025716-f1972eb1d1f5 // indirect
+	github.com/spf13/cobra v0.0.5
 	github.com/stretchr/testify v1.4.0
 	go.uber.org/dig v1.7.0
 	google.golang.org/grpc v1.25.1
