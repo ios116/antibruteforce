@@ -2,19 +2,18 @@ package entities
 
 import (
 	"antibruteforce/internal/domain/exceptions"
-	"net"
 )
 
 // Request - a request for approved.
 type Request struct {
-	IP       *net.IP
+	IP       string
 	Login    string
 	Password string
 }
 
 // Validation - validation request.
 func (r *Request) Validation() error {
-	if r.IP == nil {
+	if r.IP == "" {
 		return exceptions.IPRequired
 	}
 	if r.Login == "" {

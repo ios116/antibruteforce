@@ -6,5 +6,3 @@ import "antibruteforce/internal/config"
 type RPCServer struct {
 	conf *config.GrpcConf
 }
-
-

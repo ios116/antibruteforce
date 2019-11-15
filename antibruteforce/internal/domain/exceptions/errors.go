@@ -16,5 +16,5 @@ var (
 	IPRequired       = DomainError("Ip address is required")
 	LoginRequired    = DomainError("Login address is required")
 	PasswordRequired = DomainError("Password address is required")
-	LimitReached = DomainError("Request limit has been reached")
+	LimitReached     = DomainError("Request limit has been reached")
 )

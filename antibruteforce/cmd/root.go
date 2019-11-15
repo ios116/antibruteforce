@@ -1,8 +1,9 @@
 package cmd
 
 import (
-	"github.com/spf13/cobra"
 	"log"
+
+	"github.com/spf13/cobra"
 )
 
 var RootCmd = &cobra.Command{
@@ -15,7 +16,7 @@ var login string
 var ip string
 
 func init() {
-	RootCmd.AddCommand(CrudIp, ResetBucket, )
+	RootCmd.AddCommand(CrudIp, ResetBucket)
 
 	// buckets management
 	ResetBucket.Flags().StringVarP(&login, "login", "l", "", "bucket login")
