@@ -28,6 +28,7 @@ type BucketStoreManager interface {
 	Add(key *Hash, bucket *Bucket) error
 	Delete(hash *Hash) error
 	Get(key *Hash) (*Bucket, error)
+	TotalBuckets() int
 }
 
 // Bucket - time interval and restriction for this interval

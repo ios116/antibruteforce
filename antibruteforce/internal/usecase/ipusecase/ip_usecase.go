@@ -1,10 +1,10 @@
-package usecase
+package ipusecase
 
 import (
 	"antibruteforce/internal/config"
 	"antibruteforce/internal/domain/entities"
-	"net"
 	"context"
+	"net"
 )
 
 type IPUseCase interface {
@@ -13,11 +13,10 @@ type IPUseCase interface {
 	GetByIP(ctx context.Context, ip *net.IPNet) (*entities.IPItem, error)
 }
 
-
 // IPService
 type IPService struct {
-	Settings    *config.Settings
-	IPStore     entities.IPStoreManager
+	Settings *config.Settings
+	IPStore  entities.IPStoreManager
 }
 
 // NewIPService

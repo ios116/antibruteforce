@@ -1,4 +1,4 @@
-package usecase
+package bucketusecase
 
 import (
 	"antibruteforce/internal/config"
@@ -14,6 +14,7 @@ type BucketsUseCase interface {
 	GetBucketByHash(hash *entities.Hash) (*entities.Bucket, error)
 	CreateBucket(hash *entities.Hash) (*entities.Bucket, error)
 	CheckBucket(bucket *entities.Bucket) (bool, error)
+	TotalBuckets() int
 	BucketCollector(ctx context.Context)
 }
 
@@ -79,6 +80,11 @@ func (b *BucketService) CheckBucket(bucket *entities.Bucket) (bool, error) {
 	return true, nil
 }
 
+func (b *BucketService) TotalBuckets() int {
+	return b.BucketStore.TotalBuckets()
+}
+
+
 // BucketCollector удаление устаревшего bucket по таймауту, в канал отправляется  bucket's hash
 func (b *BucketService) BucketCollector(ctx context.Context) {
 	for {
@@ -90,5 +96,3 @@ func (b *BucketService) BucketCollector(ctx context.Context) {
 		}
 	}
 }
-
-

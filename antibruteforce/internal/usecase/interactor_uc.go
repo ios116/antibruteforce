@@ -1,20 +1,25 @@
 package usecase
 
-import "antibruteforce/internal/domain/entities"
+import (
+	"antibruteforce/internal/domain/entities"
+	"antibruteforce/internal/usecase/bucketusecase"
+	"antibruteforce/internal/usecase/ipusecase"
+)
 
-// InteractorUseCase 
+// InteractorUseCase
 type InteractorUseCase interface {
 	CheckRequest(request *entities.Request) (bool, error)
 	CheckOnceBucket(request string, kind entities.KindBucket) (bool, error)
 }
 
-// Interactor 
+// Interactor interaction between use cases
 type Interactor struct {
-	IP     IPService
-	Bucket BucketService
+	IP     ipusecase.IPService
+	Bucket bucketusecase.BucketService
 }
 
-func NewInteractor(IP IPService, bucket BucketService) *Interactor {
+// NewInteractor constructor
+func NewInteractor(IP ipusecase.IPService, bucket bucketusecase.BucketService) *Interactor {
 	return &Interactor{IP: IP, Bucket: bucket}
 }
 

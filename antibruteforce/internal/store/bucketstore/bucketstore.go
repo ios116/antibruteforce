@@ -43,3 +43,8 @@ func (st *BucketStore) Get(hash *entities.Hash) (*entities.Bucket, error) {
 	}
 	return bk, nil
 }
+
+// TotalBuckets total buckets amount
+func (st *BucketStore) TotalBuckets() int {
+    return len(st.Buckets)
+}
