@@ -15,4 +15,4 @@ tidy:
 verify:
 	go mod verify
 
-commithok: fmt vet lint tidy verify imports
+pre-commit: fmt vet lint tidy verify imports

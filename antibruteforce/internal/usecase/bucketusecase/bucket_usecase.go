@@ -84,7 +84,6 @@ func (b *BucketService) TotalBuckets() int {
 	return b.BucketStore.TotalBuckets()
 }
 
-
 // BucketCollector удаление устаревшего bucket по таймауту, в канал отправляется  bucket's hash
 func (b *BucketService) BucketCollector(ctx context.Context) {
 	for {

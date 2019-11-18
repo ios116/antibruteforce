@@ -1,39 +1,27 @@
 package cmd
 
 import (
-	"log"
-
 	"github.com/spf13/cobra"
 )
 
 var RootCmd = &cobra.Command{
-	Use:   "./main",
+	Use:   "abf",
 	Short: "anti brut force",
 }
 
-var password string
-var login string
-var ip string
+var (
+	login, ip, ipNet string
+)
 
 func init() {
-	RootCmd.AddCommand(CrudIp, ResetBucket)
 
+	RootCmd.AddCommand(blackList,whiteList, resetBucket)
 	// buckets management
-	ResetBucket.Flags().StringVarP(&login, "login", "l", "", "bucket login")
-	ResetBucket.Flags().StringVarP(&ip, "ip", "i", "", "bucket ip ")
+	resetBucket.Flags().StringVarP(&login, "login", "l", "", "bucket login")
+	resetBucket.Flags().StringVarP(&ip, "ip", "i", "", "bucket ip ")
 
-	if err := ResetBucket.MarkFlagRequired("login"); err != nil {
-		log.Println(err)
-	}
+	whiteList.AddCommand(addWhiteList, deleteWhiteList)
+    blackList.AddCommand(addBlackList, deleteBlackList)
+	RootCmd.PersistentFlags().StringVarP(&ipNet, "net", "n", "", "action with net list maybe delete or add")
 
-	if err := ResetBucket.MarkFlagRequired("ip"); err != nil {
-		log.Println(err)
-	}
-
-	// ips management
-	CrudIp.Flags().StringVarP(&ip, "ip", "i", "", "ip with mask")
-
-	if err := CrudIp.MarkFlagRequired("ip"); err != nil {
-		log.Println(err)
-	}
 }

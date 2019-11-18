@@ -145,15 +145,15 @@ func TestMem(t *testing.T) {
 		{kind: entities.Login, key: "user"},
 		{kind: entities.Login, key: "another_user"},
 	}
-	for _,request := range requests {
-		    hash:=&entities.Hash{
-				Kind: request.kind,
-				Key:  request.key,
-			}
-			bucketService.CreateBucket(hash)
+	for _, request := range requests {
+		hash := &entities.Hash{
+			Kind: request.kind,
+			Key:  request.key,
+		}
+		bucketService.CreateBucket(hash)
 	}
-    t.Log("Total=",bucketService.TotalBuckets())
-	time.Sleep(2*time.Second)
-	t.Log("Total=",bucketService.TotalBuckets())
+	t.Log("Total=", bucketService.TotalBuckets())
+	time.Sleep(2 * time.Second)
+	t.Log("Total=", bucketService.TotalBuckets())
 
 }

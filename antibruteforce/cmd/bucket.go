@@ -4,11 +4,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var ResetBucket = &cobra.Command{
+var resetBucket = &cobra.Command{
 	Use:   "bucket",
-	Short: "Reset bucket by login or ip",
+	//Args: cobra.MinimumNArgs(1),
+	Short: "Command resets bucket by login or ip",
 	Run: func(cmd *cobra.Command, args []string) {
 		//container := BuildContainer()
-
 	},
 }
