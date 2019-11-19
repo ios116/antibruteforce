@@ -6,12 +6,11 @@ package grpcserver
 import (
 	context "context"
 	fmt "fmt"
-	math "math"
-
 	proto "github.com/golang/protobuf/proto"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	math "math"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -25,8 +24,34 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
+// List is type of list may by black or white
+type List int32
+
+const (
+	List_BLACK List = 0
+	List_WHITE List = 1
+)
+
+var List_name = map[int32]string{
+	0: "BLACK",
+	1: "WHITE",
+}
+
+var List_value = map[string]int32{
+	"BLACK": 0,
+	"WHITE": 1,
+}
+
+func (x List) String() string {
+	return proto.EnumName(List_name, int32(x))
+}
+
+func (List) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptor_1b40cafcd4234784, []int{0}
+}
+
 // Request with ip, login , password
-type Request struct {
+type CheckRequest struct {
 	Login                string   `protobuf:"bytes,1,opt,name=Login,proto3" json:"Login,omitempty"`
 	Password             string   `protobuf:"bytes,2,opt,name=Password,proto3" json:"Password,omitempty"`
 	Ip                   string   `protobuf:"bytes,3,opt,name=Ip,proto3" json:"Ip,omitempty"`
@@ -35,46 +60,46 @@ type Request struct {
 	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *Request) Reset()         { *m = Request{} }
-func (m *Request) String() string { return proto.CompactTextString(m) }
-func (*Request) ProtoMessage()    {}
-func (*Request) Descriptor() ([]byte, []int) {
+func (m *CheckRequest) Reset()         { *m = CheckRequest{} }
+func (m *CheckRequest) String() string { return proto.CompactTextString(m) }
+func (*CheckRequest) ProtoMessage()    {}
+func (*CheckRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_1b40cafcd4234784, []int{0}
 }
 
-func (m *Request) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_Request.Unmarshal(m, b)
+func (m *CheckRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_CheckRequest.Unmarshal(m, b)
 }
-func (m *Request) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_Request.Marshal(b, m, deterministic)
+func (m *CheckRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_CheckRequest.Marshal(b, m, deterministic)
 }
-func (m *Request) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Request.Merge(m, src)
+func (m *CheckRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_CheckRequest.Merge(m, src)
 }
-func (m *Request) XXX_Size() int {
-	return xxx_messageInfo_Request.Size(m)
+func (m *CheckRequest) XXX_Size() int {
+	return xxx_messageInfo_CheckRequest.Size(m)
 }
-func (m *Request) XXX_DiscardUnknown() {
-	xxx_messageInfo_Request.DiscardUnknown(m)
+func (m *CheckRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_CheckRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_Request proto.InternalMessageInfo
+var xxx_messageInfo_CheckRequest proto.InternalMessageInfo
 
-func (m *Request) GetLogin() string {
+func (m *CheckRequest) GetLogin() string {
 	if m != nil {
 		return m.Login
 	}
 	return ""
 }
 
-func (m *Request) GetPassword() string {
+func (m *CheckRequest) GetPassword() string {
 	if m != nil {
 		return m.Password
 	}
 	return ""
 }
 
-func (m *Request) GetIp() string {
+func (m *CheckRequest) GetIp() string {
 	if m != nil {
 		return m.Ip
 	}
@@ -82,76 +107,207 @@ func (m *Request) GetIp() string {
 }
 
 // Response with status and detail message
-type Response struct {
+type StatusResponse struct {
 	Status               bool     `protobuf:"varint,1,opt,name=Status,proto3" json:"Status,omitempty"`
-	Detail               string   `protobuf:"bytes,2,opt,name=Detail,proto3" json:"Detail,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *Response) Reset()         { *m = Response{} }
-func (m *Response) String() string { return proto.CompactTextString(m) }
-func (*Response) ProtoMessage()    {}
-func (*Response) Descriptor() ([]byte, []int) {
+func (m *StatusResponse) Reset()         { *m = StatusResponse{} }
+func (m *StatusResponse) String() string { return proto.CompactTextString(m) }
+func (*StatusResponse) ProtoMessage()    {}
+func (*StatusResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_1b40cafcd4234784, []int{1}
 }
 
-func (m *Response) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_Response.Unmarshal(m, b)
+func (m *StatusResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_StatusResponse.Unmarshal(m, b)
 }
-func (m *Response) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_Response.Marshal(b, m, deterministic)
+func (m *StatusResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_StatusResponse.Marshal(b, m, deterministic)
 }
-func (m *Response) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Response.Merge(m, src)
+func (m *StatusResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_StatusResponse.Merge(m, src)
 }
-func (m *Response) XXX_Size() int {
-	return xxx_messageInfo_Response.Size(m)
+func (m *StatusResponse) XXX_Size() int {
+	return xxx_messageInfo_StatusResponse.Size(m)
 }
-func (m *Response) XXX_DiscardUnknown() {
-	xxx_messageInfo_Response.DiscardUnknown(m)
+func (m *StatusResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_StatusResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_Response proto.InternalMessageInfo
+var xxx_messageInfo_StatusResponse proto.InternalMessageInfo
 
-func (m *Response) GetStatus() bool {
+func (m *StatusResponse) GetStatus() bool {
 	if m != nil {
 		return m.Status
 	}
 	return false
 }
 
-func (m *Response) GetDetail() string {
+// BucketRequest is bucket for reset field may be ip or login
+type ResetBucketRequest struct {
+	Field                string   `protobuf:"bytes,1,opt,name=field,proto3" json:"field,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *ResetBucketRequest) Reset()         { *m = ResetBucketRequest{} }
+func (m *ResetBucketRequest) String() string { return proto.CompactTextString(m) }
+func (*ResetBucketRequest) ProtoMessage()    {}
+func (*ResetBucketRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_1b40cafcd4234784, []int{2}
+}
+
+func (m *ResetBucketRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ResetBucketRequest.Unmarshal(m, b)
+}
+func (m *ResetBucketRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ResetBucketRequest.Marshal(b, m, deterministic)
+}
+func (m *ResetBucketRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ResetBucketRequest.Merge(m, src)
+}
+func (m *ResetBucketRequest) XXX_Size() int {
+	return xxx_messageInfo_ResetBucketRequest.Size(m)
+}
+func (m *ResetBucketRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_ResetBucketRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ResetBucketRequest proto.InternalMessageInfo
+
+func (m *ResetBucketRequest) GetField() string {
 	if m != nil {
-		return m.Detail
+		return m.Field
+	}
+	return ""
+}
+
+// Request is request for delete or add to ip list
+type AddIpRequest struct {
+	Net                  string   `protobuf:"bytes,1,opt,name=net,proto3" json:"net,omitempty"`
+	List                 List     `protobuf:"varint,2,opt,name=list,proto3,enum=grpcserver.List" json:"list,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *AddIpRequest) Reset()         { *m = AddIpRequest{} }
+func (m *AddIpRequest) String() string { return proto.CompactTextString(m) }
+func (*AddIpRequest) ProtoMessage()    {}
+func (*AddIpRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_1b40cafcd4234784, []int{3}
+}
+
+func (m *AddIpRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_AddIpRequest.Unmarshal(m, b)
+}
+func (m *AddIpRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_AddIpRequest.Marshal(b, m, deterministic)
+}
+func (m *AddIpRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_AddIpRequest.Merge(m, src)
+}
+func (m *AddIpRequest) XXX_Size() int {
+	return xxx_messageInfo_AddIpRequest.Size(m)
+}
+func (m *AddIpRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_AddIpRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_AddIpRequest proto.InternalMessageInfo
+
+func (m *AddIpRequest) GetNet() string {
+	if m != nil {
+		return m.Net
+	}
+	return ""
+}
+
+func (m *AddIpRequest) GetList() List {
+	if m != nil {
+		return m.List
+	}
+	return List_BLACK
+}
+
+type DeleteIpRequest struct {
+	Net                  string   `protobuf:"bytes,1,opt,name=net,proto3" json:"net,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *DeleteIpRequest) Reset()         { *m = DeleteIpRequest{} }
+func (m *DeleteIpRequest) String() string { return proto.CompactTextString(m) }
+func (*DeleteIpRequest) ProtoMessage()    {}
+func (*DeleteIpRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_1b40cafcd4234784, []int{4}
+}
+
+func (m *DeleteIpRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_DeleteIpRequest.Unmarshal(m, b)
+}
+func (m *DeleteIpRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_DeleteIpRequest.Marshal(b, m, deterministic)
+}
+func (m *DeleteIpRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_DeleteIpRequest.Merge(m, src)
+}
+func (m *DeleteIpRequest) XXX_Size() int {
+	return xxx_messageInfo_DeleteIpRequest.Size(m)
+}
+func (m *DeleteIpRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_DeleteIpRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_DeleteIpRequest proto.InternalMessageInfo
+
+func (m *DeleteIpRequest) GetNet() string {
+	if m != nil {
+		return m.Net
 	}
 	return ""
 }
 
 func init() {
-	proto.RegisterType((*Request)(nil), "grpcserver.Request")
-	proto.RegisterType((*Response)(nil), "grpcserver.Response")
+	proto.RegisterEnum("grpcserver.List", List_name, List_value)
+	proto.RegisterType((*CheckRequest)(nil), "grpcserver.CheckRequest")
+	proto.RegisterType((*StatusResponse)(nil), "grpcserver.StatusResponse")
+	proto.RegisterType((*ResetBucketRequest)(nil), "grpcserver.ResetBucketRequest")
+	proto.RegisterType((*AddIpRequest)(nil), "grpcserver.AddIpRequest")
+	proto.RegisterType((*DeleteIpRequest)(nil), "grpcserver.DeleteIpRequest")
 }
 
 func init() { proto.RegisterFile("api/api.proto", fileDescriptor_1b40cafcd4234784) }
 
 var fileDescriptor_1b40cafcd4234784 = []byte{
-	// 211 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x54, 0x8f, 0xb1, 0x4b, 0xc5, 0x30,
-	0x10, 0xc6, 0x7d, 0x95, 0xf7, 0xac, 0x07, 0xbe, 0x21, 0x96, 0x52, 0x3a, 0x49, 0x27, 0xa7, 0x16,
-	0xd4, 0xc9, 0xcd, 0x2a, 0x85, 0xa2, 0x83, 0xc4, 0xcd, 0x2d, 0xd6, 0xa3, 0x06, 0x4b, 0x12, 0x2f,
-	0x57, 0xfd, 0xf7, 0xc5, 0x34, 0x58, 0xde, 0xf8, 0xfb, 0xdd, 0xf1, 0xdd, 0x77, 0x70, 0xa6, 0x9c,
-	0x6e, 0x94, 0xd3, 0xb5, 0x23, 0xcb, 0x56, 0xc0, 0x48, 0x6e, 0xf0, 0x48, 0xdf, 0x48, 0xd5, 0x23,
-	0x9c, 0x48, 0xfc, 0x9a, 0xd1, 0xb3, 0xc8, 0x60, 0xfb, 0x64, 0x47, 0x6d, 0x8a, 0xcd, 0xc5, 0xe6,
-	0xf2, 0x54, 0x2e, 0x20, 0x4a, 0x48, 0x9f, 0x95, 0xf7, 0x3f, 0x96, 0xde, 0x8b, 0x24, 0x0c, 0xfe,
-	0x59, 0xec, 0x21, 0xe9, 0x5d, 0x71, 0x1c, 0x6c, 0xd2, 0xbb, 0xea, 0x16, 0x52, 0x89, 0xde, 0x59,
-	0xe3, 0x51, 0xe4, 0xb0, 0x7b, 0x61, 0xc5, 0xb3, 0x0f, 0x71, 0xa9, 0x8c, 0xf4, 0xe7, 0x1f, 0x90,
-	0x95, 0x9e, 0x62, 0x5a, 0xa4, 0xab, 0x0e, 0xf6, 0x77, 0x86, 0x75, 0x4b, 0x33, 0x63, 0x67, 0x69,
-	0x40, 0x71, 0x03, 0xdb, 0xfb, 0x0f, 0x1c, 0x3e, 0xc5, 0x79, 0xbd, 0x16, 0xae, 0x63, 0xdb, 0x32,
-	0x3b, 0x94, 0xcb, 0xd5, 0xea, 0xa8, 0xcd, 0x5f, 0xb3, 0x46, 0x1b, 0x46, 0x32, 0x6a, 0x6a, 0xd6,
-	0x95, 0xb7, 0x5d, 0xf8, 0xfd, 0xfa, 0x37, 0x00, 0x00, 0xff, 0xff, 0x97, 0x20, 0x5a, 0x1e, 0x0c,
-	0x01, 0x00, 0x00,
+	// 344 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x84, 0x92, 0x51, 0x6b, 0xe2, 0x40,
+	0x14, 0x85, 0x35, 0x1a, 0xd1, 0xbb, 0x6e, 0x36, 0x0c, 0x22, 0xc1, 0x5d, 0x96, 0x92, 0xf6, 0x41,
+	0x7c, 0x50, 0xb0, 0x3f, 0x40, 0x8c, 0x55, 0x1a, 0xf4, 0x21, 0xa4, 0x85, 0x42, 0xdf, 0xd2, 0xe4,
+	0xd6, 0x0e, 0x86, 0x64, 0x3a, 0x33, 0x69, 0xff, 0x51, 0x7f, 0x67, 0xc9, 0xa8, 0x75, 0x6c, 0x41,
+	0xdf, 0xee, 0xb9, 0xf7, 0xe4, 0xe4, 0xe4, 0x23, 0xf0, 0x3b, 0x62, 0x74, 0x14, 0x31, 0x3a, 0x64,
+	0x3c, 0x97, 0x39, 0x81, 0x35, 0x67, 0xb1, 0x40, 0xfe, 0x86, 0xdc, 0x0d, 0xa0, 0x3d, 0x7b, 0xc1,
+	0x78, 0x13, 0xe2, 0x6b, 0x81, 0x42, 0x92, 0x0e, 0x98, 0xab, 0x7c, 0x4d, 0x33, 0xa7, 0x7a, 0x51,
+	0xed, 0xb7, 0xc2, 0xad, 0x20, 0x3d, 0x68, 0x06, 0x91, 0x10, 0xef, 0x39, 0x4f, 0x1c, 0x43, 0x1d,
+	0xbe, 0x34, 0xb1, 0xc0, 0xf0, 0x99, 0x53, 0x53, 0x5b, 0xc3, 0x67, 0x6e, 0x1f, 0xac, 0x3b, 0x19,
+	0xc9, 0x42, 0x84, 0x28, 0x58, 0x9e, 0x09, 0x24, 0x5d, 0x68, 0x6c, 0x37, 0x2a, 0xb4, 0x19, 0xee,
+	0x94, 0x3b, 0x00, 0x12, 0xa2, 0x40, 0xe9, 0x15, 0xf1, 0x06, 0xa5, 0xd6, 0xe0, 0x99, 0x62, 0x9a,
+	0xec, 0x1b, 0x28, 0xe1, 0x2e, 0xa0, 0x3d, 0x4d, 0x12, 0x9f, 0xed, 0x5d, 0x36, 0xd4, 0x32, 0x94,
+	0x3b, 0x4f, 0x39, 0x92, 0x2b, 0xa8, 0xa7, 0x54, 0x48, 0xd5, 0xcf, 0x1a, 0xdb, 0xc3, 0xc3, 0x47,
+	0x0e, 0x57, 0x54, 0xc8, 0x50, 0x5d, 0xdd, 0x4b, 0xf8, 0x73, 0x83, 0x29, 0x4a, 0x3c, 0x11, 0x35,
+	0xf8, 0x07, 0xf5, 0xf2, 0x11, 0xd2, 0x02, 0xd3, 0x5b, 0x4d, 0x67, 0x4b, 0xbb, 0x52, 0x8e, 0x0f,
+	0xb7, 0xfe, 0xfd, 0xdc, 0xae, 0x8e, 0x3f, 0x0c, 0xb0, 0xa6, 0x99, 0xa4, 0x1e, 0x2f, 0x24, 0x2e,
+	0x72, 0x1e, 0x23, 0x99, 0x80, 0xa9, 0x28, 0x12, 0x47, 0x7f, 0xad, 0x0e, 0xb6, 0xd7, 0xd3, 0x2f,
+	0xc7, 0x80, 0xdc, 0x0a, 0x59, 0xc2, 0x2f, 0x0d, 0x05, 0xf9, 0xaf, 0x9b, 0x7f, 0x32, 0x3a, 0x13,
+	0x36, 0x01, 0xb3, 0x64, 0x15, 0x1c, 0xb7, 0xd1, 0xf1, 0x9d, 0x09, 0x98, 0x43, 0x73, 0x07, 0x29,
+	0x20, 0x7f, 0x75, 0xe7, 0x37, 0x74, 0xa7, 0x63, 0xbc, 0xee, 0x63, 0x67, 0x44, 0x33, 0x89, 0x3c,
+	0x8b, 0xd2, 0xd1, 0xc1, 0xf8, 0xd4, 0x50, 0xbf, 0xe1, 0xf5, 0x67, 0x00, 0x00, 0x00, 0xff, 0xff,
+	0x78, 0x58, 0xf1, 0xf2, 0x97, 0x02, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -166,7 +322,10 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type AntiBruteForceClient interface {
-	Check(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error)
+	Check(ctx context.Context, in *CheckRequest, opts ...grpc.CallOption) (*StatusResponse, error)
+	ResetBucket(ctx context.Context, in *ResetBucketRequest, opts ...grpc.CallOption) (*StatusResponse, error)
+	AddIP(ctx context.Context, in *AddIpRequest, opts ...grpc.CallOption) (*StatusResponse, error)
+	DeleteIP(ctx context.Context, in *DeleteIpRequest, opts ...grpc.CallOption) (*StatusResponse, error)
 }
 
 type antiBruteForceClient struct {
@@ -177,9 +336,36 @@ func NewAntiBruteForceClient(cc *grpc.ClientConn) AntiBruteForceClient {
 	return &antiBruteForceClient{cc}
 }
 
-func (c *antiBruteForceClient) Check(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error) {
-	out := new(Response)
-	err := c.cc.Invoke(ctx, "/grpcserver.AntiBruteForce/CheckBucket", in, out, opts...)
+func (c *antiBruteForceClient) Check(ctx context.Context, in *CheckRequest, opts ...grpc.CallOption) (*StatusResponse, error) {
+	out := new(StatusResponse)
+	err := c.cc.Invoke(ctx, "/grpcserver.AntiBruteForce/Check", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *antiBruteForceClient) ResetBucket(ctx context.Context, in *ResetBucketRequest, opts ...grpc.CallOption) (*StatusResponse, error) {
+	out := new(StatusResponse)
+	err := c.cc.Invoke(ctx, "/grpcserver.AntiBruteForce/ResetBucket", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *antiBruteForceClient) AddIP(ctx context.Context, in *AddIpRequest, opts ...grpc.CallOption) (*StatusResponse, error) {
+	out := new(StatusResponse)
+	err := c.cc.Invoke(ctx, "/grpcserver.AntiBruteForce/AddIP", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *antiBruteForceClient) DeleteIP(ctx context.Context, in *DeleteIpRequest, opts ...grpc.CallOption) (*StatusResponse, error) {
+	out := new(StatusResponse)
+	err := c.cc.Invoke(ctx, "/grpcserver.AntiBruteForce/DeleteIP", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -188,15 +374,27 @@ func (c *antiBruteForceClient) Check(ctx context.Context, in *Request, opts ...g
 
 // AntiBruteForceServer is the server API for AntiBruteForce service.
 type AntiBruteForceServer interface {
-	Check(context.Context, *Request) (*Response, error)
+	Check(context.Context, *CheckRequest) (*StatusResponse, error)
+	ResetBucket(context.Context, *ResetBucketRequest) (*StatusResponse, error)
+	AddIP(context.Context, *AddIpRequest) (*StatusResponse, error)
+	DeleteIP(context.Context, *DeleteIpRequest) (*StatusResponse, error)
 }
 
 // UnimplementedAntiBruteForceServer can be embedded to have forward compatible implementations.
 type UnimplementedAntiBruteForceServer struct {
 }
 
-func (*UnimplementedAntiBruteForceServer) Check(ctx context.Context, req *Request) (*Response, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CheckBucket not implemented")
+func (*UnimplementedAntiBruteForceServer) Check(ctx context.Context, req *CheckRequest) (*StatusResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Check not implemented")
+}
+func (*UnimplementedAntiBruteForceServer) ResetBucket(ctx context.Context, req *ResetBucketRequest) (*StatusResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ResetBucket not implemented")
+}
+func (*UnimplementedAntiBruteForceServer) AddIP(ctx context.Context, req *AddIpRequest) (*StatusResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddIP not implemented")
+}
+func (*UnimplementedAntiBruteForceServer) DeleteIP(ctx context.Context, req *DeleteIpRequest) (*StatusResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteIP not implemented")
 }
 
 func RegisterAntiBruteForceServer(s *grpc.Server, srv AntiBruteForceServer) {
@@ -204,7 +402,7 @@ func RegisterAntiBruteForceServer(s *grpc.Server, srv AntiBruteForceServer) {
 }
 
 func _AntiBruteForce_Check_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Request)
+	in := new(CheckRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -213,10 +411,64 @@ func _AntiBruteForce_Check_Handler(srv interface{}, ctx context.Context, dec fun
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/grpcserver.AntiBruteForce/CheckBucket",
+		FullMethod: "/grpcserver.AntiBruteForce/Check",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AntiBruteForceServer).Check(ctx, req.(*Request))
+		return srv.(AntiBruteForceServer).Check(ctx, req.(*CheckRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AntiBruteForce_ResetBucket_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ResetBucketRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AntiBruteForceServer).ResetBucket(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/grpcserver.AntiBruteForce/ResetBucket",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AntiBruteForceServer).ResetBucket(ctx, req.(*ResetBucketRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AntiBruteForce_AddIP_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddIpRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AntiBruteForceServer).AddIP(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/grpcserver.AntiBruteForce/AddIP",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AntiBruteForceServer).AddIP(ctx, req.(*AddIpRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AntiBruteForce_DeleteIP_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteIpRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AntiBruteForceServer).DeleteIP(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/grpcserver.AntiBruteForce/DeleteIP",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AntiBruteForceServer).DeleteIP(ctx, req.(*DeleteIpRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -226,8 +478,20 @@ var _AntiBruteForce_serviceDesc = grpc.ServiceDesc{
 	HandlerType: (*AntiBruteForceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "CheckBucket",
+			MethodName: "Check",
 			Handler:    _AntiBruteForce_Check_Handler,
+		},
+		{
+			MethodName: "ResetBucket",
+			Handler:    _AntiBruteForce_ResetBucket_Handler,
+		},
+		{
+			MethodName: "AddIP",
+			Handler:    _AntiBruteForce_AddIP_Handler,
+		},
+		{
+			MethodName: "DeleteIP",
+			Handler:    _AntiBruteForce_DeleteIP_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -3,18 +3,39 @@ package grpcserver;
 option go_package = "/internal/grpcserver";
 
 // Request with ip, login , password
-message Request {
+message CheckRequest {
     string Login = 1;
     string Password = 2;
     string Ip = 3;
 }
 
 // Response with status and detail message
-message Response {
+message StatusResponse {
     bool Status = 1;
-    string Detail = 2;
 }
 
+// BucketRequest is bucket for reset field may be ip or login
+message ResetBucketRequest {
+    string field = 1;
+}
+// List is type of list may by black or white
+enum List {
+    BLACK = 0;
+    WHITE = 1;
+}
+
+// Request is request for delete or add to ip list
+message AddIpRequest {
+   string net = 1;
+   List list = 2;
+}
+message DeleteIpRequest {
+    string net = 1;
+}
+// The method checks request
 service AntiBruteForce {
-    rpc Check (Request) returns (Response){};
+    rpc Check (CheckRequest) returns (StatusResponse ){};
+    rpc ResetBucket (ResetBucketRequest) returns (StatusResponse){};
+    rpc AddIP(AddIpRequest) returns (StatusResponse){};
+    rpc DeleteIP(DeleteIpRequest) returns (StatusResponse){};
 }

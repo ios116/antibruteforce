@@ -5,6 +5,8 @@ import (
 	"antibruteforce/internal/domain/entities"
 	"antibruteforce/internal/domain/exceptions"
 	"context"
+	"fmt"
+	"go.uber.org/zap"
 	"time"
 )
 
@@ -16,6 +18,7 @@ type BucketsUseCase interface {
 	CheckBucket(bucket *entities.Bucket) (bool, error)
 	TotalBuckets() int
 	BucketCollector(ctx context.Context)
+	ResetBucket(hash *entities.Hash) error
 }
 
 // BucketService содержет хранилище buckets, настройки для разного bucket type и канал для удаления неиспользуемых buckets по таймауту
@@ -23,6 +26,7 @@ type BucketService struct {
 	BucketStore entities.BucketStoreManager
 	Settings    *config.Settings
 	Callback    chan *entities.Hash
+	logger      *zap.Logger
 }
 
 // NewBuckets создание экземпляра buckets
@@ -84,12 +88,23 @@ func (b *BucketService) TotalBuckets() int {
 	return b.BucketStore.TotalBuckets()
 }
 
+func (b *BucketService) ResetBucket(hash *entities.Hash) error {
+	if err := b.BucketStore.Delete(hash); err != nil {
+		return err
+	}
+	return nil
+}
+
 // BucketCollector удаление устаревшего bucket по таймауту, в канал отправляется  bucket's hash
 func (b *BucketService) BucketCollector(ctx context.Context) {
 	for {
 		select {
 		case hash := <-b.Callback:
-			b.BucketStore.Delete(hash)
+			err := b.ResetBucket(hash)
+			if err != nil {
+				err = fmt.Errorf("bucket collector: %w", err)
+				b.logger.Error(err.Error())
+			}
 		case <-ctx.Done():
 			return
 		}
