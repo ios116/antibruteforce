@@ -10,7 +10,7 @@ import (
 type IPUseCase interface {
 	AddIpToList(ctx context.Context, ip *entities.IPItem) error
 	DeleteByIP(ctx context.Context, ip *net.IPNet) error
-	GetByIP(ctx context.Context, ip *net.IPNet) (*entities.IPItem, error)
+	GetByIPWithMask(ctx context.Context, ip *net.IPNet) (*entities.IPItem, error)
 }
 
 // IPService
@@ -34,7 +34,11 @@ func (b *IPService) DeleteByIP(ctx context.Context, ip *net.IPNet) error {
 	return b.IPStore.DeleteByIP(ctx, ip)
 }
 
-// GetByIP
-func (b *IPService) GetByIP(ctx context.Context, ip *net.IPNet) (*entities.IPItem, error) {
+// GetByIPWithMask get IP with mask
+func (b *IPService) GetByIPWithMask(ctx context.Context, ip *net.IPNet) (*entities.IPItem, error) {
 	return b.IPStore.GetByIP(ctx, ip)
+}
+
+func (b *IPService) CheckIP(subnet *net.IPNet, ip net.IP) {
+     subnet.Contains(ip)
 }

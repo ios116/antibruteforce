@@ -1,9 +1,10 @@
 package config
 
 import (
+	"log"
+
 	"github.com/caarlos0/env/v6"
 	"go.uber.org/zap"
-	"log"
 )
 
 // Settings are used to set restrictions on requests.

@@ -11,7 +11,8 @@ import (
 )
 
 func TestDbRepo_Add(t *testing.T) {
-	ipv4Addr, ipv4Net, err := net.ParseCIDR("192.4.4.88/32")
+	ipv4Addr, ipv4Net, err := net.ParseCIDR("192.168.0.1/24")
+	// 192.168.0.254
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -44,8 +45,9 @@ func TestDbRepo_Add(t *testing.T) {
 		}
 	})
 
-	t.Run("GetBucketByHash by ip", func(t *testing.T) {
-		result, err := repo.GetByIP(ctx, ipv4Net)
+	t.Run("Get by ip", func(t *testing.T) {
+	    ip:=net.ParseIP("192.168.0.254")
+		result, err := repo.GetByIP(ctx, ip)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -56,6 +58,7 @@ func TestDbRepo_Add(t *testing.T) {
 	})
 
 	t.Run("Delete by ip", func(t *testing.T) {
+		t.Log(ipv4Net.String())
 		err = repo.DeleteByIP(ctx, ipv4Net)
 		if err != nil {
 			t.Fatal(err)

@@ -7,23 +7,23 @@ import (
 	"antibruteforce/internal/usecase/bucketusecase"
 	"antibruteforce/internal/usecase/ipusecase"
 	"context"
+	"net"
+
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
-	"net"
 )
 
 // RPCServer grpc api
 type RPCServer struct {
-	Conf           *config.GrpcConf
-	Logger         *zap.Logger
-	IPService      ipusecase.IPUseCase
-	BucketService  bucketusecase.BucketsUseCase
-	IntegratorService usecase.Interactor
+	Conf              *config.GrpcConf
+	Logger            *zap.Logger
+	IPService         ipusecase.IPUseCase
+	BucketService     bucketusecase.BucketsUseCase
+	IntegratorService usecase.InteractorUseCase
 }
 
 // Check grpc method for check request
 func (r *RPCServer) Check(ctx context.Context, in *CheckRequest, opts ...grpc.CallOption) (*StatusResponse, error) {
-
 	req := &entities.Request{
 		IP:       in.Ip,
 		Login:    in.Login,
@@ -38,8 +38,23 @@ func (r *RPCServer) Check(ctx context.Context, in *CheckRequest, opts ...grpc.Ca
 
 // ResetBucket grpc method for reset bucket
 func (r *RPCServer) ResetBucket(ctx context.Context, in *ResetBucketRequest, opts ...grpc.CallOption) (*StatusResponse, error) {
-
-	panic("not implementation")
+	var kind entities.KindBucket
+	switch in.Kind {
+	case BucketKind_IP:
+		kind = entities.IP
+	case BucketKind_LOGIN:
+		kind = entities.Login
+	case BucketKind_PASSWORD:
+		kind = entities.Password
+	}
+	hash := &entities.Hash{
+		Kind: kind,
+		Key:  in.Key,
+	}
+	if err := r.BucketService.ResetBucket(hash); err != nil {
+		return &StatusResponse{Status: false}, err
+	}
+	return &StatusResponse{Status: true}, nil
 }
 
 // AddIP grpc method for add ip to whitelist or blacklist

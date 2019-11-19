@@ -46,5 +46,8 @@ func (st *BucketStore) Get(hash *entities.Hash) (*entities.Bucket, error) {
 
 // TotalBuckets total buckets amount
 func (st *BucketStore) TotalBuckets() int {
-	return len(st.Buckets)
+	st.mux.Lock()
+	total := len(st.Buckets)
+	st.mux.Unlock()
+	return total
 }

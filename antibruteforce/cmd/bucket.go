@@ -5,7 +5,7 @@ import (
 )
 
 var resetBucket = &cobra.Command{
-	Use:   "bucket",
+	Use: "bucket",
 	//Args: cobra.MinimumNArgs(1),
 	Short: "Command resets bucket by login or ip",
 	Run: func(cmd *cobra.Command, args []string) {

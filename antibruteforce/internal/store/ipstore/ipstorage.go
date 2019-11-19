@@ -37,8 +37,8 @@ func (d *DbRepo) Add(ctx context.Context, ip *entities.IPItem) error {
 	return nil
 }
 
-// GetByIP get by ip
-func (d *DbRepo) GetByIP(ctx context.Context, ip *net.IPNet) (*entities.IPItem, error) {
+// GetByIPWithMask get by ip
+func (d *DbRepo) GetByIPWithMask(ctx context.Context, ip *net.IPNet) (*entities.IPItem, error) {
 	dest := &IPTable{}
 	err := d.db.GetContext(ctx, dest, "SELECT * FROM ip_list WHERE ip=$1", ip.String())
 	if err != nil {
@@ -51,6 +51,23 @@ func (d *DbRepo) GetByIP(ctx context.Context, ip *net.IPNet) (*entities.IPItem, 
 		DateCreated: dest.DateCreated,
 	}, nil
 }
+
+// GetByIPWithMask get by ip
+func (d *DbRepo) GetByIP(ctx context.Context, ip net.IP) (*entities.IPItem, error) {
+	dest := &IPTable{}
+	err := d.db.GetContext(ctx, dest, "SELECT * FROM ip_list WHERE ip >> $1", ip.String())
+	if err != nil {
+		return nil, err
+	}
+	return &entities.IPItem{
+		ID:          dest.ID,
+		Kind:        dest.Kind,
+		IP:          dest.IP.IPNet,
+		DateCreated: dest.DateCreated,
+	}, nil
+}
+
+
 
 // Delete delete by ip
 func (d *DbRepo) DeleteByIP(ctx context.Context, ip *net.IPNet) error {

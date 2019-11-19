@@ -6,8 +6,9 @@ import (
 	"antibruteforce/internal/domain/exceptions"
 	"context"
 	"fmt"
-	"go.uber.org/zap"
 	"time"
+
+	"go.uber.org/zap"
 )
 
 // BucketsManager интерфейс позводляющий проверить наличие свободных маркеров и удалить устаревший bucket
