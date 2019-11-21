@@ -37,41 +37,33 @@ func (d *DbRepo) Add(ctx context.Context, ip *entities.IPItem) error {
 	return nil
 }
 
-// GetByIPWithMask get by ip
-func (d *DbRepo) GetByIPWithMask(ctx context.Context, ip *net.IPNet) (*entities.IPItem, error) {
-	dest := &IPTable{}
-	err := d.db.GetContext(ctx, dest, "SELECT * FROM ip_list WHERE ip=$1", ip.String())
+// GetSubnetByIP get subnet by ip
+func (d *DbRepo) GetSubnetBySubnet(ctx context.Context, ip *net.IPNet) ([]*entities.IPItem, error) {
+	var ips []*entities.IPItem
+	rows, err := d.db.QueryxContext(ctx, "SELECT * FROM ip_list WHERE ip >>= $1 ORDER BY IP ASC", ip.String())
+	defer rows.Close()
 	if err != nil {
 		return nil, err
 	}
-	return &entities.IPItem{
-		ID:          dest.ID,
-		Kind:        dest.Kind,
-		IP:          dest.IP.IPNet,
-		DateCreated: dest.DateCreated,
-	}, nil
-}
 
-// GetByIPWithMask get by ip
-func (d *DbRepo) GetByIP(ctx context.Context, ip net.IP) (*entities.IPItem, error) {
-	dest := &IPTable{}
-	err := d.db.GetContext(ctx, dest, "SELECT * FROM ip_list WHERE ip >> $1", ip.String())
-	if err != nil {
-		return nil, err
+	for rows.Next() {
+		dest := &IPTable{}
+		if err := rows.StructScan(&dest); err != nil {
+			return nil, err
+		}
+		ips = append(ips, &entities.IPItem{
+			ID:          dest.ID,
+			Kind:        dest.Kind,
+			IP:          dest.IP.IPNet,
+			DateCreated: dest.DateCreated,
+		})
 	}
-	return &entities.IPItem{
-		ID:          dest.ID,
-		Kind:        dest.Kind,
-		IP:          dest.IP.IPNet,
-		DateCreated: dest.DateCreated,
-	}, nil
+	return ips, nil
 }
-
-
 
 // Delete delete by ip
 func (d *DbRepo) DeleteByIP(ctx context.Context, ip *net.IPNet) error {
-	result, err := d.db.ExecContext(ctx, "DELETE FROM ip_list WHERE ip =$1", ip.IP.String())
+	result, err := d.db.ExecContext(ctx, "DELETE FROM ip_list WHERE ip = $1", ip.String())
 	if err != nil {
 		return err
 	}

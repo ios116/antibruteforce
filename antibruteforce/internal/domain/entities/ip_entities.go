@@ -26,5 +26,5 @@ type IPItem struct {
 type IPStoreManager interface {
 	Add(ctx context.Context, list *IPItem) error
 	DeleteByIP(ctx context.Context, ip *net.IPNet) error
-	GetByIP(ctx context.Context, ip *net.IPNet) (*IPItem, error)
+	GetSubnetBySubnet(ctx context.Context, ip *net.IPNet) ([]*IPItem, error)
 }

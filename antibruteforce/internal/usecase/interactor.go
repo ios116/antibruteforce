@@ -31,8 +31,6 @@ func (b *Interactor) CheckRequest(request *entities.Request) (bool, error) {
 	//ctx := context.Background()
 	//passwordHash := entities.NewHash(entities.Password,request.Password)
 
-
-
 	IPStatus, err := b.CheckOnceBucket(request.IP, entities.IP)
 	if err != nil {
 		return false, err

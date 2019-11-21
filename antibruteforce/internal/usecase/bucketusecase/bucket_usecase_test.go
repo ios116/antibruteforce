@@ -46,25 +46,6 @@ func TestMain(m *testing.M) {
 
 func TestGet(t *testing.T) {
 
-	//testObj := new(MockedBucketStore)
-	//settings := config.NewSettings()
-	//bucketsUseCase := NewBuckets(testObj, settings)
-	//t.Run("GetBucketByHash bucket", func(t *testing.T) {
-	//	testObj.On("GetBucketByHash", "admin").Return(&entities.Bucket{}, exceptions.BucketsNil)
-	//	_, err := bucketsUseCase.GetBucketByHash("admin")
-	//	if err == nil {
-	//		t.Fatal("bucket not created yet")
-	//	}
-	//})
-	//
-	//t.Run("Created bucket", func(t *testing.T) {
-	//	duration := time.Second * time.Duration(bucketsUseCase.Settings.Duration)
-	//	bucket := entities.NewBucket(bucketsUseCase.Settings.LoginRequests, duration, "admin", bucketsUseCase.Callback)
-	//    testObj.On("CreateBucket","admin",bucket).Return(nil)
-	//    bucket,err:= bucketsUseCase.CreateBucket("admin",entities.Login)
-	//    t.Log(bucket, err)
-	//})
-
 	var bucket *entities.Bucket
 	var err error
 

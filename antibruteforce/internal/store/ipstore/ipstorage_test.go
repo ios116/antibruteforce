@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-func TestDbRepo_Add(t *testing.T) {
+func TestDbRepo(t *testing.T) {
 	ipv4Addr, ipv4Net, err := net.ParseCIDR("192.168.0.1/24")
 	// 192.168.0.254
 	if err != nil {
@@ -44,25 +44,27 @@ func TestDbRepo_Add(t *testing.T) {
 			t.Fatal(err)
 		}
 	})
-
-	t.Run("Get by ip", func(t *testing.T) {
-	    ip:=net.ParseIP("192.168.0.254")
-		result, err := repo.GetByIP(ctx, ip)
+	t.Run("Get by ip with mask 32", func(t *testing.T) {
+		ipv4Net := &net.IPNet{
+			IP:   ipv4Addr,
+			Mask: net.CIDRMask(32, 32),
+		}
+		result, err := repo.GetSubnetBySubnet(ctx, ipv4Net)
 		if err != nil {
 			t.Fatal(err)
 		}
-		t.Log(result)
-		if result.IP.String() != ipv4Net.String() {
-			t.Fatal("ip is not equal", result.IP, ipv4Net)
+		if len(result) == 0 {
+			t.Fatal("ip address not found")
 		}
 	})
 
 	t.Run("Delete by ip", func(t *testing.T) {
-		t.Log(ipv4Net.String())
+		t.Log("delete", ipv4Net.String())
 		err = repo.DeleteByIP(ctx, ipv4Net)
 		if err != nil {
 			t.Fatal(err)
 		}
 	})
+	// ip:=net.ParseIP("192.168.0.254")
 
 }
