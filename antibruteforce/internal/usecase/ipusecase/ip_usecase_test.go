@@ -29,17 +29,17 @@ func (m MockedIPStore) GetSubnetBySubnet(ctx context.Context, ip *net.IPNet) ([]
 
 func TestIpUseCase(t *testing.T) {
 	ipv4Addr1, ipv4Net1, _ := net.ParseCIDR("192.168.0.1/24")
-	ipv4Addr2, ipv4Net2, _ := net.ParseCIDR("192.168.0.1/32")
+	ipv4Addr2, ipv4Net2, _ := net.ParseCIDR("91.225.77.47/32")
 
 	testData := []struct {
-		ips  []*entities.IPItem
-		ip   net.IP
-		net  *net.IPNet
-		err  error
-		kind entities.IPKind
+		ip            net.IP
+		net           *net.IPNet
+		expectedIP    []*entities.IPItem
+		expectedError error
+		expectedKind  entities.IPKind
 	}{
 		{
-			ips: []*entities.IPItem{
+			expectedIP: []*entities.IPItem{
 				&entities.IPItem{
 					ID:          1,
 					Kind:        entities.Black,
@@ -47,19 +47,19 @@ func TestIpUseCase(t *testing.T) {
 					DateCreated: time.Now(),
 				},
 			},
-			ip:   ipv4Addr1,
-			net:  ipv4Net1,
-			kind: entities.Black,
-			err:  nil,
+			ip:            ipv4Addr1,
+			net:           ipv4Net1,
+			expectedKind:  entities.Black,
+			expectedError: nil,
 		},
 		{
-			ips: []*entities.IPItem{
+			expectedIP: []*entities.IPItem{
 				&entities.IPItem{},
 			},
-			ip:   ipv4Addr2,
-			net:  ipv4Net2,
-			err:  nil,
-			kind: "",
+			ip:            ipv4Addr2,
+			net:           ipv4Net2,
+			expectedError: nil,
+			expectedKind:  "",
 		},
 	}
 
@@ -88,21 +88,35 @@ func TestIpUseCase(t *testing.T) {
 		t.Log(err)
 	})
 
-	t.Run("check ip as string", func(t *testing.T) {
-
-	})
-
 	t.Run("check ip", func(t *testing.T) {
 		for _, item := range testData {
-			testObj.On("GetSubnetBySubnet", ctx, item.net).Return(item.ips, nil)
+			testObj.On("GetSubnetBySubnet", ctx, item.net).Return(item.expectedIP, nil)
 			kind, err := newIpService.checkSubnet(ctx, item.net)
-			if err != item.err {
+			if err != item.expectedError {
 				t.Fatal(err)
 			}
-			if kind != item.kind {
-				t.Fatalf("kind of list from test data %s but we have %s", item.kind, kind, )
+			if kind != item.expectedKind {
+				t.Fatalf("expectedKind of list from test data %s but we have %s", item.expectedKind, kind, )
 			}
 		}
 	})
 
+	t.Run("check ip as string", func(t *testing.T) {
+		for _, item := range testData {
+			testObj.On("GetSubnetBySubnet", ctx, item.net).Return(item.expectedIP, nil)
+			kind, err := newIpService.CheckIpAsString(ctx, item.ip.String())
+			//if err != item.expectedError {
+			//	t.Fatal(err)
+			//}
+
+			t.Log(err)
+
+			t.Log(kind)
+
+		}
+	})
+
 }
+
+
+

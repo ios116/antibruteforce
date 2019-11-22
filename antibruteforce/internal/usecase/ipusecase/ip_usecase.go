@@ -50,11 +50,13 @@ func (b *IPService) CheckIpAsString(ctx context.Context, address string) (entiti
 	if ip == nil {
 		return "", exceptions.IPRequired
 	}
+
 	ipNet:= &net.IPNet{
 		IP:   ip,
 		Mask: net.CIDRMask(32,32),
 	}
-	return b.checkSubnet(ctx, ipNet)
+	k, err:= b.checkSubnet(ctx, ipNet)
+	return k,err
 }
 
 // CheckSubnetAsString checks the Net as string, whether it is whitelisted or blacklisted
