@@ -67,7 +67,6 @@ func TestIpUseCase(t *testing.T) {
 	settings := config.NewSettings()
 	newIpService := NewIPService(settings, testObj)
 	ctx := context.Background()
-	// 192.168.0.254
 
 	t.Log(ipv4Addr1, ipv4Net1)
 	ip := &entities.IPItem{
@@ -85,13 +84,12 @@ func TestIpUseCase(t *testing.T) {
 		if err == nil {
 			t.Fatal(err)
 		}
-		t.Log(err)
 	})
 
-	t.Run("check ip", func(t *testing.T) {
+	t.Run("Check ip", func(t *testing.T) {
 		for _, item := range testData {
 			testObj.On("GetSubnetBySubnet", ctx, item.net).Return(item.expectedIP, nil)
-			kind, err := newIpService.checkSubnet(ctx, item.net)
+			kind, err := newIpService.CheckSubnet(ctx, item.net)
 			if err != item.expectedError {
 				t.Fatal(err)
 			}
@@ -100,22 +98,6 @@ func TestIpUseCase(t *testing.T) {
 			}
 		}
 	})
-
-	t.Run("check ip as string", func(t *testing.T) {
-		for _, item := range testData {
-			testObj.On("GetSubnetBySubnet", ctx, item.net).Return(item.expectedIP, nil)
-			kind, err := newIpService.CheckIpAsString(ctx, item.ip.String())
-			//if err != item.expectedError {
-			//	t.Fatal(err)
-			//}
-
-			t.Log(err)
-
-			t.Log(kind)
-
-		}
-	})
-
 }
 
 

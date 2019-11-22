@@ -44,33 +44,9 @@ func (b *IPService) DeleteNet(ctx context.Context, ip *net.IPNet) error {
 	return b.IPStore.DeleteByIP(ctx, ip)
 }
 
-// CheckIP checks the IP as string, whether it is whitelisted or blacklisted
-func (b *IPService) CheckIpAsString(ctx context.Context, address string) (entities.IPKind, error) {
-	ip:=net.ParseIP(address)
-	if ip == nil {
-		return "", exceptions.IPRequired
-	}
-
-	ipNet:= &net.IPNet{
-		IP:   ip,
-		Mask: net.CIDRMask(32,32),
-	}
-	k, err:= b.checkSubnet(ctx, ipNet)
-	return k,err
-}
-
-// CheckSubnetAsString checks the Net as string, whether it is whitelisted or blacklisted
-func (b *IPService) CheckSubnetAsString(ctx context.Context, address string) (entities.IPKind, error) {
-     _,ipNet, err := net.ParseCIDR(address)
-     if err != nil {
-     	return "", err
-	 }
-	return b.checkSubnet(ctx, ipNet)
-}
-
 // CheckSubnet checks the subnet, whether it is whitelisted or blacklisted
 // If it does not contain a return nil
-func (b *IPService) checkSubnet(ctx context.Context, ip *net.IPNet) (entities.IPKind, error) {
+func (b *IPService) CheckSubnet(ctx context.Context, ip *net.IPNet) (entities.IPKind, error) {
 	if ip == nil {
 		return "",exceptions.IPRequired
 	}
