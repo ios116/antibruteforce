@@ -8,7 +8,8 @@ func (ee DomainError) Error() string {
 	return string(ee)
 }
 
-var (
+// Domain errors
+const (
 	NilValue         = DomainError("Value is nil")
 	KeyRequired      = DomainError("Key is required")
 	TypeNotFound     = DomainError("Type not found")

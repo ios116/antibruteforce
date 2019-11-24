@@ -4,8 +4,10 @@ import (
 	"time"
 )
 
+// KindBucket type of bucket
 type KindBucket string
 
+// Login, Password, IP type of buckets
 const (
 	Login    KindBucket = "login"
 	Password            = "password"

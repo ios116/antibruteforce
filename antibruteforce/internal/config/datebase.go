@@ -10,10 +10,10 @@ import (
 
 // DateBaseConf config
 type DateBaseConf struct {
-	BdPassword string `env:"PGPASSWORD" envDefault:"123456"`
-	BdUser     string `env:"PGUSER" envDefault:"postgres"`
-	BdHost     string `env:"PGHOST" envDefault:"0.0.0.0"`
-	BdName     string `env:"PGDATABASE" envDefault:"force"`
+	BdPassword string `env:"POSTGRES_PASSWORD" envDefault:"123456"`
+	BdUser     string `env:"POSTGRES_USER" envDefault:"postgres"`
+	BdHost     string `env:"POSTGRES_HOST" envDefault:"0.0.0.0"`
+	BdName     string `env:"POSTGRES_DB" envDefault:"force"`
 }
 
 // NewDateBaseConf parsing env

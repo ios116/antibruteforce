@@ -11,6 +11,7 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
+// IPTable structure describes date base table
 type IPTable struct {
 	ID          int64
 	Kind        entities.IPKind
@@ -28,8 +29,8 @@ func NewDbRepo(db *sqlx.DB) *DbRepo {
 	return &DbRepo{db: db}
 }
 
-// CreateBucket adding new ip may by black or white
-func (d *DbRepo) Add(ctx context.Context, ip *entities.IPItem) error {
+// Add adding new ip may by black or white
+func (d *DbRepo) Add(ctx context.Context, ip *entities.IPListRow) error {
 	_, err := d.db.ExecContext(ctx, "INSERT INTO ip_list (ip, kind, date_created) VALUES ($1,$2,$3)", ip.IP.String(), ip.Kind, time.Now())
 	if err != nil {
 		return err
@@ -37,9 +38,9 @@ func (d *DbRepo) Add(ctx context.Context, ip *entities.IPItem) error {
 	return nil
 }
 
-// GetSubnetByIP get subnet by ip
-func (d *DbRepo) GetSubnetBySubnet(ctx context.Context, ip *net.IPNet) ([]*entities.IPItem, error) {
-	var ips []*entities.IPItem
+// GetSubnetBySubnet get subnet by ip
+func (d *DbRepo) GetSubnetBySubnet(ctx context.Context, ip *net.IPNet) ([]*entities.IPListRow, error) {
+	var ips []*entities.IPListRow
 	rows, err := d.db.QueryxContext(ctx, "SELECT * FROM ip_list WHERE ip >>= $1 ORDER BY IP ASC", ip.String())
 	defer rows.Close()
 	if err != nil {
@@ -51,7 +52,7 @@ func (d *DbRepo) GetSubnetBySubnet(ctx context.Context, ip *net.IPNet) ([]*entit
 		if err := rows.StructScan(&dest); err != nil {
 			return nil, err
 		}
-		ips = append(ips, &entities.IPItem{
+		ips = append(ips, &entities.IPListRow{
 			ID:          dest.ID,
 			Kind:        dest.Kind,
 			IP:          dest.IP.IPNet,
@@ -61,7 +62,7 @@ func (d *DbRepo) GetSubnetBySubnet(ctx context.Context, ip *net.IPNet) ([]*entit
 	return ips, nil
 }
 
-// Delete delete by ip
+// DeleteByIP delete by ip
 func (d *DbRepo) DeleteByIP(ctx context.Context, ip *net.IPNet) error {
 	result, err := d.db.ExecContext(ctx, "DELETE FROM ip_list WHERE ip = $1", ip.String())
 	if err != nil {

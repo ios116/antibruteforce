@@ -11,7 +11,7 @@ message CheckRequest {
 
 // Response with status and detail message
 message StatusResponse {
-    bool Status = 1;
+    bool Ok = 1;
 }
 
 // BucketKind kind of bucket

@@ -6,7 +6,7 @@ import (
 	"sync"
 )
 
-// BucketStore
+// BucketStore stores for bucket in memory
 type BucketStore struct {
 	mux     sync.Mutex
 	Buckets map[*entities.Hash]*entities.Bucket
@@ -25,7 +25,7 @@ func (st *BucketStore) Add(hash *entities.Hash, bucket *entities.Bucket) error {
 	return nil
 }
 
-// Delete bucket by key
+// Delete bucket by hash
 func (st *BucketStore) Delete(hash *entities.Hash) error {
 	st.mux.Lock()
 	delete(st.Buckets, hash)

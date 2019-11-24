@@ -7,13 +7,13 @@ import (
 	"go.uber.org/zap"
 )
 
-// Settings are used to set restrictions on requests.
+// Settings are used to set restrictions on LIMIT.
 type Settings struct {
-	LoginRequests    int    `env:"LOGIN_REQUESTS" envDefault:"10"`
-	PasswordRequests int    `env:"PASSWORD_REQUESTS" envDefault:"100"`
-	IPRequests       int    `env:"IP_REQUESTS" envDefault:"1000"`
-	Duration         int32  `env:"DURATION" envDefault:"60"`
-	Build            string `env:"BUILD" envDefault:"dev"`
+	LoginLimit    int    `env:"LOGIN_LIMIT" envDefault:"10"`
+	PasswordLimit int    `env:"PASSWORD_LIMIT" envDefault:"100"`
+	IPLimit       int    `env:"IP_LIMIT" envDefault:"1000"`
+	Duration      int32  `env:"DURATION" envDefault:"60"`
+	Build         string `env:"BUILD" envDefault:"dev"`
 }
 
 // NewSettings new instance for Settings

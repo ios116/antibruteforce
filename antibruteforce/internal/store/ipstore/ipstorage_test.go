@@ -32,7 +32,7 @@ func TestDbRepo(t *testing.T) {
 	repo := NewDbRepo(db)
 	ctx := context.Background()
 
-	ip := &entities.IPItem{
+	ip := &entities.IPListRow{
 		Kind:        entities.Black,
 		IP:          ipv4Net,
 		DateCreated: time.Time{},

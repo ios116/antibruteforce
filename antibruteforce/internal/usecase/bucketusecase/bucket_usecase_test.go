@@ -37,7 +37,7 @@ func TestMain(m *testing.M) {
 	settings := config.NewSettings()
 	// set 1 request in 3 seconds to login
 	settings.Duration = 3
-	settings.LoginRequests = 1
+	settings.LoginLimit = 1
 	// Create buckets use case
 	bucketService = NewBucketService(bucketStore, settings)
 	code := m.Run()

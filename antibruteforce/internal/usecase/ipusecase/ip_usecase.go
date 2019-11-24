@@ -10,33 +10,31 @@ import (
 
 // IPUseCase it's interface for use case ip address
 type IPUseCase interface {
-	AddNet(ctx context.Context, ip *entities.IPItem) error
+	AddNet(ctx context.Context, ip *entities.IPListRow) error
 	DeleteNet(ctx context.Context, ip *net.IPNet) error
-	CheckSubnetAsString(ctx context.Context, address string) (*entities.IPKind, error)
-	CheckIpAsString(ctx context.Context, address string) (*entities.IPKind, error)
-	checkSubnet(ctx context.Context, ip *net.IPNet) (*entities.IPKind, error)
+	CheckSubnet(ctx context.Context, ip *net.IPNet) (entities.IPKind, error)
 }
 
-// IPService
+// IPService implementation IPUseCase interface
 type IPService struct {
 	Settings *config.Settings
 	IPStore  entities.IPStoreManager
 }
 
-// NewIPService
+// NewIPService constructor
 func NewIPService(settings *config.Settings, IPStore entities.IPStoreManager) *IPService {
 	return &IPService{Settings: settings, IPStore: IPStore}
 }
 
-// AddIpToList adding to ip to list
-func (b *IPService) AddNet(ctx context.Context, ip *entities.IPItem) error {
+// AddNet adding to ip to list
+func (b *IPService) AddNet(ctx context.Context, ip *entities.IPListRow) error {
 	if ip == nil {
 		return exceptions.IPRequired
 	}
 	return b.IPStore.Add(ctx, ip)
 }
 
-// DeleteByIP delete ip from list
+// DeleteNet delete ip from list
 func (b *IPService) DeleteNet(ctx context.Context, ip *net.IPNet) error {
 	if ip == nil {
 		return exceptions.IPRequired
@@ -48,7 +46,7 @@ func (b *IPService) DeleteNet(ctx context.Context, ip *net.IPNet) error {
 // If it does not contain a return nil
 func (b *IPService) CheckSubnet(ctx context.Context, ip *net.IPNet) (entities.IPKind, error) {
 	if ip == nil {
-		return "",exceptions.IPRequired
+		return "", exceptions.IPRequired
 	}
 	res, err := b.IPStore.GetSubnetBySubnet(ctx, ip)
 	if err != nil {
@@ -61,5 +59,3 @@ func (b *IPService) CheckSubnet(ctx context.Context, ip *net.IPNet) (entities.IP
 		return res[0].Kind, nil
 	}
 }
-
-

@@ -1,6 +1,33 @@
 version: '3'
 services:
 
+  abf:
+    image: ab:1.0
+    container_name: ab
+    environment:
+      POSTGRES_PASSWORD: 123456
+      POSTGRES_USER: postgres
+      POSTGRES_DB: force
+      POSTGRES_HOST: db
+      LOGIN_LIMIT: 10
+      PASSWORD_LIMIT: 100
+      IP_LIMIT: 1000
+      DURATION: 60
+      BUILD: dev
+      GRPC_PORT: 50051
+      GRPC_HOST: 0.0.0.0
+      GRPC_TOKEN: secret
+    command:  ./wait-for-it.sh db:5432 -- go run main.go grpc
+    depends_on:
+      - db
+    restart: on-failure
+    volumes:
+      - ./antibruteforce:/code
+    ports:
+      - "50051:50051"
+    networks:
+      - net
+
   db:
     image: postgres:11.2
     container_name: postgres

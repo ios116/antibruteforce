@@ -11,7 +11,7 @@ import (
 	"go.uber.org/zap"
 )
 
-// BucketsManager интерфейс позводляющий проверить наличие свободных маркеров и удалить устаревший bucket
+// BucketsUseCase интерфейс позводляющий проверить наличие свободных маркеров и удалить устаревший bucket
 type BucketsUseCase interface {
 	// for buckets
 	GetBucketByHash(hash *entities.Hash) (*entities.Bucket, error)
@@ -30,7 +30,7 @@ type BucketService struct {
 	logger      *zap.Logger
 }
 
-// NewBuckets создание экземпляра buckets
+// NewBucketService создание экземпляра buckets
 func NewBucketService(store entities.BucketStoreManager, settings *config.Settings) *BucketService {
 	callback := make(chan *entities.Hash)
 	return &BucketService{BucketStore: store, Settings: settings, Callback: callback}
@@ -59,11 +59,11 @@ func (b *BucketService) CreateBucket(hash *entities.Hash) (*entities.Bucket, err
 
 	switch hash.Kind {
 	case entities.Login:
-		bucket = entities.NewBucket(b.Settings.LoginRequests, duration, hash, b.Callback)
+		bucket = entities.NewBucket(b.Settings.LoginLimit, duration, hash, b.Callback)
 	case entities.Password:
-		bucket = entities.NewBucket(b.Settings.PasswordRequests, duration, hash, b.Callback)
+		bucket = entities.NewBucket(b.Settings.PasswordLimit, duration, hash, b.Callback)
 	case entities.IP:
-		bucket = entities.NewBucket(b.Settings.IPRequests, duration, hash, b.Callback)
+		bucket = entities.NewBucket(b.Settings.IPLimit, duration, hash, b.Callback)
 	default:
 		return nil, exceptions.TypeNotFound
 	}
@@ -85,10 +85,12 @@ func (b *BucketService) CheckBucket(bucket *entities.Bucket) (bool, error) {
 	return true, nil
 }
 
+// TotalBuckets total buckets in memory
 func (b *BucketService) TotalBuckets() int {
 	return b.BucketStore.TotalBuckets()
 }
 
+//ResetBucket reset bucket by hash
 func (b *BucketService) ResetBucket(hash *entities.Hash) error {
 	if err := b.BucketStore.Delete(hash); err != nil {
 		return err

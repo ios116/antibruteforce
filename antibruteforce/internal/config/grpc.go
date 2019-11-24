@@ -4,8 +4,6 @@ import (
 	"log"
 
 	"github.com/caarlos0/env/v6"
-	_ "github.com/jackc/pgx"
-	_ "github.com/jackc/pgx/stdlib"
 )
 
 // GrpcConf struct for grpc env
