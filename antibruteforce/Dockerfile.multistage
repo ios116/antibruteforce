@@ -1,0 +1,16 @@
+FROM golang:1.13 as builder
+RUN mkdir /code
+ADD . /code
+WORKDIR /code
+RUN go mod download
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o abf .
+
+########## Start a new stage ##########
+FROM alpine:latest
+RUN apk --no-cache add ca-certificates
+RUN mkdir /code
+WORKDIR /code/
+COPY --from=builder /code/wait-for.sh /code/
+RUN chmod +x /code/wait-for.sh
+COPY --from=builder /code/abf .
+CMD ["./abf"]

@@ -22,11 +22,11 @@ func ipService(settings *config.Settings, IPStore *ipstore.DbRepo) *ipusecase.IP
 	return ipusecase.NewIPService(settings, IPStore)
 }
 
-func ineractor(ipService *ipusecase.IPService, bucketService *bucketusecase.BucketService) *interactor.Interactor {
-	return interactor.NewInteractor(ipService, bucketService)
+func ineractor(ipService *ipusecase.IPService, bucketService *bucketusecase.BucketService) *interactor.Connector {
+	return interactor.NewConnector(ipService, bucketService)
 }
 
-func grpc(conf *config.GrpcConf, logger *zap.Logger, IPService *ipusecase.IPService, bucketService *bucketusecase.BucketService, integratorService *interactor.Interactor) *grpcserver.RPCServer {
+func grpc(conf *config.GrpcConf, logger *zap.Logger, IPService *ipusecase.IPService, bucketService *bucketusecase.BucketService, integratorService *interactor.Connector) *grpcserver.RPCServer {
 	return grpcserver.NewRPCServer(conf, logger, IPService, bucketService, integratorService)
 }
 

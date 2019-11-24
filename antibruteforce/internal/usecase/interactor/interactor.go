@@ -9,25 +9,25 @@ import (
 	"net"
 )
 
-// InteractorUseCase interface to interaction between use cases
-type InteractorUseCase interface {
+// ConnectorUseCase interface to interaction between use cases
+type ConnectorUseCase interface {
 	CheckRequest(request *entities.Request) (bool, error)
 	CheckOnceBucket(request string, kind entities.KindBucket) (bool, error)
 }
 
-// Interactor interaction between use cases
-type Interactor struct {
+// Connector interaction between use cases
+type Connector struct {
 	IP     ipusecase.IPUseCase
 	Bucket bucketusecase.BucketsUseCase
 }
 
-// NewInteractor constructor
-func NewInteractor(IP ipusecase.IPUseCase, bucket bucketusecase.BucketsUseCase) *Interactor {
-	return &Interactor{IP: IP, Bucket: bucket}
+// NewConnector constructor
+func NewConnector(IP ipusecase.IPUseCase, bucket bucketusecase.BucketsUseCase) *Connector {
+	return &Connector{IP: IP, Bucket: bucket}
 }
 
 // CheckRequest checking a request by ip login and passport
-func (i *Interactor) CheckRequest(request *entities.Request) (bool, error) {
+func (i *Connector) CheckRequest(request *entities.Request) (bool, error) {
 	if err := request.Validation(); err != nil {
 		return false, err
 	}
@@ -69,10 +69,10 @@ func (i *Interactor) CheckRequest(request *entities.Request) (bool, error) {
 }
 
 // CheckOnceBucket check once bucket may be password, login, ip
-func (i *Interactor) CheckOnceBucket(request string, kind entities.KindBucket) (bool, error) {
+func (i *Connector) CheckOnceBucket(request string, kind entities.KindBucket) (bool, error) {
 	hash := entities.NewHash(kind, request)
 	bucket, err := i.Bucket.GetBucketByHash(hash)
-	if err == nil {
+	if bucket == nil {
 		bucket, err = i.Bucket.CreateBucket(hash)
 		if err != nil {
 			return false, err

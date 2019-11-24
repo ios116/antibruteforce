@@ -2,7 +2,6 @@ package bucketstore
 
 import (
 	"antibruteforce/internal/domain/entities"
-	"antibruteforce/internal/domain/exceptions"
 	"sync"
 )
 
@@ -39,7 +38,7 @@ func (st *BucketStore) Get(hash *entities.Hash) (*entities.Bucket, error) {
 	defer st.mux.Unlock()
 	bk, ok := st.Buckets[hash]
 	if !ok {
-		return nil, exceptions.NilValue
+		return nil, nil
 	}
 	return bk, nil
 }

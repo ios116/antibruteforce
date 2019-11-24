@@ -4,7 +4,6 @@ import (
 	"antibruteforce/internal/config"
 	"antibruteforce/internal/domain/entities"
 	"antibruteforce/internal/store/bucketstore"
-	"context"
 	"os"
 	"testing"
 	"time"
@@ -93,8 +92,7 @@ func TestGet(t *testing.T) {
 	})
 
 	// Running collector of buckets
-	ctx := context.Background()
-	go bucketService.BucketCollector(ctx)
+	go bucketService.BucketCollector()
 	time.Sleep(time.Second * 4)
 	t.Run("CheckBucket for bucket removal after the expiration of a lifetime", func(t *testing.T) {
 		_, err = bucketService.GetBucketByHash(hash)
@@ -103,18 +101,6 @@ func TestGet(t *testing.T) {
 		}
 	})
 }
-
-//func BenchmarkBucket(b *testing.B) {
-//	b.RunParallel(func(pb *testing.PB) {
-//		for pb.Next() {
-//			hash := &entities.Hash{
-//				Kind: entities.Login,
-//				Key:  "admin",
-//			}
-//			bucketService.CreateBucket(hash)
-//		}
-//	})
-//}
 
 func TestMem(t *testing.T) {
 	requests := []struct {

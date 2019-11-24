@@ -20,11 +20,11 @@ type RPCServer struct {
 	Logger            *zap.Logger
 	IPService         ipusecase.IPUseCase
 	BucketService     bucketusecase.BucketsUseCase
-	IntegratorService interactor.InteractorUseCase
+	IntegratorService interactor.ConnectorUseCase
 }
 
 // NewRPCServer constructor for GRPC server
-func NewRPCServer(conf *config.GrpcConf, logger *zap.Logger, IPService ipusecase.IPUseCase, bucketService bucketusecase.BucketsUseCase, integratorService interactor.InteractorUseCase) *RPCServer {
+func NewRPCServer(conf *config.GrpcConf, logger *zap.Logger, IPService ipusecase.IPUseCase, bucketService bucketusecase.BucketsUseCase, integratorService interactor.ConnectorUseCase) *RPCServer {
 	return &RPCServer{Conf: conf, Logger: logger, IPService: IPService, BucketService: bucketService, IntegratorService: integratorService}
 }
 
@@ -36,6 +36,7 @@ func (r *RPCServer) Start() {
 		r.Logger.Fatal("Cannot start RPC server", zap.String("err", err.Error()))
 	}
 	// server := grpc.NewServer(grpc.UnaryInterceptor(newInterceptor(g.logger, g.conf.GrpcToken)))
+	go r.BucketService.BucketCollector()
 	server := grpc.NewServer()
 	RegisterAntiBruteForceServer(server, r)
 	r.Logger.Info("Starting RPC server", zap.String("address", address))
@@ -96,6 +97,7 @@ func (r *RPCServer) AddIP(ctx context.Context, in *AddIpRequest) (*StatusRespons
 	return &StatusResponse{Ok: err == nil}, err
 }
 
+
 // DeleteIP delete ip from list
 func (r *RPCServer) DeleteIP(ctx context.Context, in *DeleteIpRequest) (*StatusResponse, error) {
 	_, netIP, err := net.ParseCIDR(in.Net)
@@ -104,4 +106,30 @@ func (r *RPCServer) DeleteIP(ctx context.Context, in *DeleteIpRequest) (*StatusR
 	}
 	err = r.IPService.DeleteNet(ctx, netIP)
 	return &StatusResponse{Ok: err == nil}, err
+}
+
+
+// GetSubnet get all subnet by net
+func (r *RPCServer) GetSubnet(ctx context.Context, in *GetSubnetRequest) (*GetSubnetResponse, error) {
+	results, err := r.IPService.GetSubnet(ctx, in.Net)
+	if err != nil {
+		return nil, err
+	}
+	var nets []*Net
+	for _, item := range results {
+		var list List
+		switch item.Kind {
+		case entities.Black:
+			list = List_BLACK
+		case entities.White:
+			list = List_WHITE
+		}
+		nets = append(nets, &Net{
+			Net:  item.IP.String(),
+			List: list,
+		})
+	}
+	return &GetSubnetResponse{
+		Nets: nets,
+	}, nil
 }

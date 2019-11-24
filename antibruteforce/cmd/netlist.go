@@ -11,6 +11,7 @@ var blackList = &cobra.Command{
 	Short: "Command choice the blacklist",
 	Args:  cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
+
 		fmt.Println("blacklist= ", ipNet)
 	},
 }

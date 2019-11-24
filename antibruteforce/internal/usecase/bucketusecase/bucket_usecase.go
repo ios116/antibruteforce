@@ -4,7 +4,6 @@ import (
 	"antibruteforce/internal/config"
 	"antibruteforce/internal/domain/entities"
 	"antibruteforce/internal/domain/exceptions"
-	"context"
 	"fmt"
 	"time"
 
@@ -18,7 +17,7 @@ type BucketsUseCase interface {
 	CreateBucket(hash *entities.Hash) (*entities.Bucket, error)
 	CheckBucket(bucket *entities.Bucket) (bool, error)
 	TotalBuckets() int
-	BucketCollector(ctx context.Context)
+	BucketCollector()
 	ResetBucket(hash *entities.Hash) error
 }
 
@@ -77,7 +76,7 @@ func (b *BucketService) CreateBucket(hash *entities.Hash) (*entities.Bucket, err
 // CheckBucket checks if a limit exist.
 func (b *BucketService) CheckBucket(bucket *entities.Bucket) (bool, error) {
 	if bucket == nil {
-		return false, exceptions.NilValue
+		return false, fmt.Errorf("CheckBucket: %w", exceptions.NilValue)
 	}
 	if !bucket.Counter() {
 		return false, exceptions.LimitReached
@@ -99,17 +98,11 @@ func (b *BucketService) ResetBucket(hash *entities.Hash) error {
 }
 
 // BucketCollector удаление устаревшего bucket по таймауту, в канал отправляется  bucket's hash
-func (b *BucketService) BucketCollector(ctx context.Context) {
-	for {
-		select {
-		case hash := <-b.Callback:
-			err := b.ResetBucket(hash)
-			if err != nil {
-				err = fmt.Errorf("bucket collector: %w", err)
-				b.logger.Error(err.Error())
-			}
-		case <-ctx.Done():
-			return
-		}
+func (b *BucketService) BucketCollector() {
+	hash := <-b.Callback
+	err := b.ResetBucket(hash)
+	if err != nil {
+		err = fmt.Errorf("bucket collector: %w", err)
+		b.logger.Error(err.Error())
 	}
 }

@@ -13,6 +13,7 @@ type IPUseCase interface {
 	AddNet(ctx context.Context, ip *entities.IPListRow) error
 	DeleteNet(ctx context.Context, ip *net.IPNet) error
 	CheckSubnet(ctx context.Context, ip *net.IPNet) (entities.IPKind, error)
+	GetSubnet(ctx context.Context, subnet string) ([]*entities.IPListRow, error)
 }
 
 // IPService implementation IPUseCase interface
@@ -58,4 +59,16 @@ func (b *IPService) CheckSubnet(ctx context.Context, ip *net.IPNet) (entities.IP
 	default:
 		return res[0].Kind, nil
 	}
+}
+
+func (b *IPService) GetSubnet(ctx context.Context, subnet string) ([]*entities.IPListRow, error) {
+	_, ipNet, err := net.ParseCIDR(subnet)
+	if err != nil {
+		return nil, err
+	}
+	res, err := b.IPStore.GetSubnetBySubnet(ctx, ipNet)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
 }

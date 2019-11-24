@@ -1,0 +1,56 @@
+version: '3'
+services:
+
+  abf.com:
+    build:
+      context: ./antibruteforce
+      dockerfile: Dockerfile.multistage
+    container_name: ab_test
+    environment:
+      POSTGRES_PASSWORD: 123456
+      POSTGRES_USER: postgres
+      POSTGRES_DB: force
+      POSTGRES_HOST: db
+      LOGIN_LIMIT: 10
+      PASSWORD_LIMIT: 100
+      IP_LIMIT: 1000
+      DURATION: 60
+      BUILD: dev
+      GRPC_PORT: 50051
+      GRPC_HOST: 0.0.0.0
+      GRPC_TOKEN: secret
+    command:  sh -c './wait-for.sh db:5432 -- ./abf grpc'
+    depends_on:
+      - db
+    restart: on-failure
+    networks:
+      - net
+
+  integration_test:
+    build: ./integration_test
+    environment:
+      GRPC_PORT: 50051
+      GRPC_HOST: abf.com
+    depends_on:
+      - db
+      - abf.com
+    command: "true"
+    networks:
+      - net
+
+  db:
+    image: postgres:11.2
+    container_name: postgres_test
+    environment:
+      POSTGRES_PASSWORD: 123456
+      POSTGRES_USER: postgres
+      POSTGRES_DB: force
+    networks:
+      - net
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./antibruteforce/sql/setup.sql:/docker-entrypoint-initdb.d/setup.sql
+networks:
+  net:
+    driver: bridge

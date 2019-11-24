@@ -43,6 +43,19 @@ message AddIpRequest {
 message DeleteIpRequest {
     string net = 1;
 }
+//GetSubnetRequest returning subnet
+message GetSubnetRequest {
+    string net = 1;
+}
+// Net
+message Net {
+    string net = 1;
+    List list = 2;
+}
+// GetSubnetResponse array nets
+message GetSubnetResponse {
+    repeated Net nets = 1;
+}
 
 // The method checks request
 service AntiBruteForce {
@@ -50,4 +63,5 @@ service AntiBruteForce {
     rpc ResetBucket (ResetBucketRequest) returns (StatusResponse) {};
     rpc AddIP (AddIpRequest) returns (StatusResponse) {};
     rpc DeleteIP (DeleteIpRequest) returns (StatusResponse) {};
+    rpc GetSubnet (GetSubnetRequest) returns (GetSubnetResponse) {};
 }
