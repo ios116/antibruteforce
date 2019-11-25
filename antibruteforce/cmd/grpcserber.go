@@ -7,7 +7,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var grpcServer = &cobra.Command{
+var grpcRun = &cobra.Command{
 	Use:   "grpc",
 	Short: "Command to start grpc server",
 	Run: func(cmd *cobra.Command, args []string) {

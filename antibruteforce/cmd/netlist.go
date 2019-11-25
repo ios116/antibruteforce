@@ -1,9 +1,12 @@
 package cmd
 
 import (
+	"antibruteforce/internal/config"
+	"antibruteforce/internal/grpcserver"
+	"context"
 	"fmt"
-
 	"github.com/spf13/cobra"
+	"log"
 )
 
 var blackList = &cobra.Command{
@@ -20,7 +23,26 @@ var deleteBlackList = &cobra.Command{
 	Short: "The command removes ip from the blacklist",
 	//	Args: cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("delete black list", ipNet)
+		container := BuildContainer()
+		err := container.Invoke(func(conf *config.GrpcConf) {
+			conn, err := newGrpcConnection(conf)
+			defer conn.Close()
+			if err != nil {
+				log.Fatal(err)
+			}
+			server := grpcserver.NewAntiBruteForceClient(conn)
+			ctx := context.Background()
+			req := &grpcserver.DeleteIpRequest{
+				Net: ipNet,
+			}
+			status, err := server.DeleteIP(ctx, req)
+			if err != nil {
+				log.Fatal(err)
+			}
+			fmt.Println(status.Ok)
+
+		})
+		log.Fatal(err)
 	},
 }
 
@@ -39,15 +61,6 @@ var whiteList = &cobra.Command{
 	Args:  cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("white=", ipNet)
-	},
-}
-
-var deleteWhiteList = &cobra.Command{
-	Use:   "delete",
-	Short: "The command removes ip from the whitelist",
-	//	Args: cobra.MinimumNArgs(1),
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("delete white list", ipNet)
 	},
 }
 

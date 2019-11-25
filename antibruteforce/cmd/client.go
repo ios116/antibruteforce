@@ -2,12 +2,9 @@ package cmd
 
 import (
 	"antibruteforce/internal/config"
-	"antibruteforce/internal/grpcserver"
 	"context"
 	"fmt"
-	"github.com/spf13/cobra"
 	"google.golang.org/grpc"
-	"log"
 )
 
 type tokenAuth struct {
@@ -24,36 +21,10 @@ func (t *tokenAuth) RequireTransportSecurity() bool {
 	return false
 }
 
-var grpcClient = &cobra.Command{
-	Use:   "client",
-	Short: "client grpc server",
-	Run: func(cmd *cobra.Command, args []string) {
-		container := BuildContainer()
-		err := container.Invoke(func(serverGRPS *grpcserver.RPCServer) {
-			option := grpc.WithPerRPCCredentials(&tokenAuth{"Bearer secret"})
-			conf := config.NewGrpcConf()
-			address := fmt.Sprintf("%s:%d", conf.GrpcHost, conf.GrpcPort)
-			conn, err := grpc.Dial(address, option, grpc.WithInsecure())
-			log.Println(address)
-			if err != nil {
-				log.Fatal(err)
-			}
-			server := grpcserver.NewAntiBruteForceClient(conn)
-			ctx := context.Background()
-			req := &grpcserver.CheckRequest{
-				Login:    "Admin",
-				Password: "123456",
-				Ip:       "91.245.34.189",
-			}
-			for i:=0; i<12; i++ {
-				status, err := server.Check(ctx, req)
-				if i ==10 && err != nil {
-					log.Println("===> ",i,status, err)
-				}
-			}
-		})
-		if err != nil {
-			log.Println(err)
-		}
-	},
+func newGrpcConnection(conf *config.GrpcConf) (*grpc.ClientConn, error) {
+	token := fmt.Sprintf("Bearer %s", conf.GrpcToken)
+	option := grpc.WithPerRPCCredentials(&tokenAuth{token})
+	address := fmt.Sprintf("%s:%d", conf.GrpcHost, conf.GrpcPort)
+	conn, err := grpc.Dial(address, option, grpc.WithInsecure())
+	return conn, err
 }

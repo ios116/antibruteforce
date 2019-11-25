@@ -16,7 +16,7 @@ var (
 
 func init() {
 
-	RootCmd.AddCommand(blackList, whiteList, resetBucket, grpcServer, grpcClient)
+	RootCmd.AddCommand(blackList, whiteList, resetBucket, grpcRun)
 	// buckets management
 	resetBucket.Flags().StringVarP(&login, "login", "l", "", "bucket login")
 	resetBucket.Flags().StringVarP(&ip, "ip", "i", "", "bucket ip ")
