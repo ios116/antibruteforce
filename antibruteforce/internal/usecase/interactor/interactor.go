@@ -25,8 +25,6 @@ type BucketsChecker interface {
 	CheckBucket(bucket *entities.Bucket) (bool, error)
 }
 
-
-
 // Connector interaction between use cases
 type Connector struct {
 	IP     ipusecase.IPUseCase
