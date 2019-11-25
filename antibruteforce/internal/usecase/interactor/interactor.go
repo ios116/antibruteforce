@@ -3,8 +3,6 @@ package interactor
 import (
 	"antibruteforce/internal/domain/entities"
 	"antibruteforce/internal/domain/exceptions"
-	"antibruteforce/internal/usecase/bucketusecase"
-	"antibruteforce/internal/usecase/ipusecase"
 	"context"
 	"net"
 )
@@ -16,7 +14,7 @@ type ConnectorUseCase interface {
 }
 
 type SubnetChecker interface {
-	GetSubnet(ctx context.Context, subnet string) ([]*entities.IPListRow, error)
+	CheckSubnet(ctx context.Context, ip *net.IPNet) (entities.IPKind, error)
 }
 
 type BucketsChecker interface {
@@ -27,12 +25,12 @@ type BucketsChecker interface {
 
 // Connector interaction between use cases
 type Connector struct {
-	IP     ipusecase.IPUseCase
-	Bucket bucketusecase.BucketsUseCase
+	IP     SubnetChecker
+	Bucket BucketsChecker
 }
 
 // NewConnector constructor
-func NewConnector(IP ipusecase.IPUseCase, bucket bucketusecase.BucketsUseCase) *Connector {
+func NewConnector(IP SubnetChecker, bucket BucketsChecker) *Connector {
 	return &Connector{IP: IP, Bucket: bucket}
 }
 

@@ -22,10 +22,6 @@ type IPService struct {
 	IPStore  entities.IPStoreManager
 }
 
-
-
-
-
 // NewIPService constructor
 func NewIPService(settings *config.Settings, IPStore entities.IPStoreManager) *IPService {
 	return &IPService{Settings: settings, IPStore: IPStore}

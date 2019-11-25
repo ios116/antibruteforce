@@ -51,8 +51,8 @@ func TestGet(t *testing.T) {
 	hash := entities.NewHash(entities.Login, "admin")
 
 	t.Run("GetBucketByHash bucket if not exist", func(t *testing.T) {
-		_, err = bucketService.GetBucketByHash(hash)
-		if err == nil {
+		bucket, _ = bucketService.GetBucketByHash(hash)
+		if bucket != nil {
 			t.Fatal("bucket must be nil and error should be")
 		}
 	})
@@ -95,8 +95,8 @@ func TestGet(t *testing.T) {
 	go bucketService.BucketCollector()
 	time.Sleep(time.Second * 4)
 	t.Run("CheckBucket for bucket removal after the expiration of a lifetime", func(t *testing.T) {
-		_, err = bucketService.GetBucketByHash(hash)
-		if err == nil {
+		bucket, _ = bucketService.GetBucketByHash(hash)
+		if bucket != nil {
 			t.Fatal("bucket must be nil")
 		}
 	})
@@ -117,6 +117,7 @@ func TestMem(t *testing.T) {
 			Kind: request.kind,
 			Key:  request.key,
 		}
+
 		bucketService.CreateBucket(hash)
 	}
 	t.Log("Total=", bucketService.TotalBuckets())

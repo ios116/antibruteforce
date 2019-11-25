@@ -20,23 +20,14 @@ func TestIpUseCase(t *testing.T) {
 		expectedKind  entities.IPKind
 	}{
 		{
-			expectedIP: []*entities.IPListRow{
-				{
-					ID:          1,
-					Kind:        entities.Black,
-					IP:          ipv4Net1,
-					DateCreated: time.Now(),
-				},
-			},
+			expectedIP:    []*entities.IPListRow{{ID: 1, Kind: entities.Black, IP: ipv4Net1, DateCreated: time.Now(),},},
 			ip:            ipv4Addr1,
 			net:           ipv4Net1,
 			expectedKind:  entities.Black,
 			expectedError: nil,
 		},
 		{
-			expectedIP: []*entities.IPListRow{
-				{},
-			},
+			expectedIP:    []*entities.IPListRow{{},},
 			ip:            ipv4Addr2,
 			net:           ipv4Net2,
 			expectedError: nil,
