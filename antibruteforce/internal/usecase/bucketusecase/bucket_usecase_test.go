@@ -4,6 +4,7 @@ import (
 	"antibruteforce/internal/config"
 	"antibruteforce/internal/domain/entities"
 	"antibruteforce/internal/store/bucketstore"
+	"go.uber.org/zap"
 	"os"
 	"testing"
 	"time"
@@ -38,7 +39,8 @@ func TestMain(m *testing.M) {
 	settings.Duration = 3
 	settings.LoginLimit = 1
 	// Create buckets use case
-	bucketService = NewBucketService(bucketStore, settings)
+	logger, _ := zap.NewDevelopment()
+	bucketService = NewBucketService(bucketStore, settings, logger)
 	code := m.Run()
 	os.Exit(code)
 }
@@ -47,7 +49,6 @@ func TestGet(t *testing.T) {
 
 	var bucket *entities.Bucket
 	var err error
-
 	hash := entities.NewHash(entities.Login, "admin")
 
 	t.Run("GetBucketByHash bucket if not exist", func(t *testing.T) {
@@ -65,8 +66,9 @@ func TestGet(t *testing.T) {
 	})
 
 	t.Run("Checking the presence of a bucket after adding", func(t *testing.T) {
-		bucket, err = bucketService.GetBucketByHash(hash)
-		if err != nil {
+		hash2 := entities.NewHash(entities.Login, "admin")
+		bucket, err = bucketService.GetBucketByHash(hash2)
+		if bucket == nil {
 			t.Fatal(err)
 		}
 	})
@@ -103,6 +105,7 @@ func TestGet(t *testing.T) {
 }
 
 func TestMem(t *testing.T) {
+	go bucketService.BucketCollector()
 	requests := []struct {
 		kind entities.KindBucket
 		key  string
@@ -113,15 +116,19 @@ func TestMem(t *testing.T) {
 		{kind: entities.Login, key: "another_user"},
 	}
 	for _, request := range requests {
-		hash := &entities.Hash{
+		hash := entities.Hash{
 			Kind: request.kind,
 			Key:  request.key,
 		}
-
-		bucketService.CreateBucket(hash)
+		_, err:= bucketService.CreateBucket(hash)
+		if err !=nil {
+			t.Fatal(err)
+		}
 	}
 	t.Log("Total=", bucketService.TotalBuckets())
-	time.Sleep(2 * time.Second)
-	t.Log("Total=", bucketService.TotalBuckets())
+	time.Sleep(5 * time.Second)
+	if total :=  bucketService.TotalBuckets(); total !=0 {
+		t.Logf("bucket collector not working Total=%d should be 0", total)
+	}
 
 }

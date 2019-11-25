@@ -5,40 +5,40 @@ import (
 	"antibruteforce/internal/domain/entities"
 	"antibruteforce/internal/domain/exceptions"
 	"fmt"
-	"time"
-
 	"go.uber.org/zap"
+	"time"
 )
 
 // BucketsUseCase интерфейс позводляющий проверить наличие свободных маркеров и удалить устаревший bucket
 type BucketsUseCase interface {
 	// for buckets
-	GetBucketByHash(hash *entities.Hash) (*entities.Bucket, error)
-	CreateBucket(hash *entities.Hash) (*entities.Bucket, error)
+	GetBucketByHash(hash entities.Hash) (*entities.Bucket, error)
+	CreateBucket(hash entities.Hash) (*entities.Bucket, error)
 	CheckBucket(bucket *entities.Bucket) (bool, error)
 	TotalBuckets() int
 	BucketCollector()
-	ResetBucket(hash *entities.Hash) error
+	ResetBucket(hash entities.Hash) error
+	CheckOrCreateBucket(request string, kind entities.KindBucket) (bool, error)
 }
 
 // BucketService содержет хранилище buckets, настройки для разного bucket type и канал для удаления неиспользуемых buckets по таймауту
 type BucketService struct {
 	BucketStore entities.BucketStoreManager
 	Settings    *config.Settings
-	Callback    chan *entities.Hash
-	logger      *zap.Logger
+	Callback    chan entities.Hash
+	Logger      *zap.Logger
 }
 
 // NewBucketService создание экземпляра buckets
-func NewBucketService(store entities.BucketStoreManager, settings *config.Settings) *BucketService {
-	callback := make(chan *entities.Hash)
-	return &BucketService{BucketStore: store, Settings: settings, Callback: callback}
+func NewBucketService(store entities.BucketStoreManager, settings *config.Settings, logger *zap.Logger) *BucketService {
+	callback := make(chan entities.Hash)
+	return &BucketService{BucketStore: store, Settings: settings, Callback: callback, Logger:logger}
 }
 
 // GetBucketByHash get bucket by hash
-func (b *BucketService) GetBucketByHash(hash *entities.Hash) (*entities.Bucket, error) {
-	if hash == nil {
-		return nil, exceptions.KeyRequired
+func (b *BucketService) GetBucketByHash(hash entities.Hash) (*entities.Bucket, error) {
+	if err := hash.Validation(); err != nil {
+		return nil, err
 	}
 	var bucket *entities.Bucket
 	bucket, err := b.BucketStore.Get(hash)
@@ -49,9 +49,9 @@ func (b *BucketService) GetBucketByHash(hash *entities.Hash) (*entities.Bucket, 
 }
 
 // CreateBucket new bucket with hash
-func (b *BucketService) CreateBucket(hash *entities.Hash) (*entities.Bucket, error) {
-	if hash == nil {
-		return nil, exceptions.KeyRequired
+func (b *BucketService) CreateBucket(hash entities.Hash) (*entities.Bucket, error) {
+	if err := hash.Validation(); err != nil {
+		return nil, err
 	}
 	var bucket *entities.Bucket
 	duration := time.Second * time.Duration(b.Settings.Duration)
@@ -90,7 +90,7 @@ func (b *BucketService) TotalBuckets() int {
 }
 
 //ResetBucket reset bucket by hash
-func (b *BucketService) ResetBucket(hash *entities.Hash) error {
+func (b *BucketService) ResetBucket(hash entities.Hash) error {
 	if err := b.BucketStore.Delete(hash); err != nil {
 		return err
 	}
@@ -99,10 +99,27 @@ func (b *BucketService) ResetBucket(hash *entities.Hash) error {
 
 // BucketCollector удаление устаревшего bucket по таймауту, в канал отправляется  bucket's hash
 func (b *BucketService) BucketCollector() {
-	hash := <-b.Callback
-	err := b.ResetBucket(hash)
-	if err != nil {
-		err = fmt.Errorf("bucket collector: %w", err)
-		b.logger.Error(err.Error())
+	for {
+		hash := <-b.Callback
+		err := b.ResetBucket(hash)
+		if err != nil {
+			err = fmt.Errorf("bucket collector: %w", err)
+			b.Logger.Error(err.Error())
+		}
+		b.Logger.Info("bucket was deleted", zap.String("hash",hash.Key))
 	}
+}
+
+// CheckOnceBucket check once bucket may be password, login, ip
+func (b *BucketService) CheckOrCreateBucket(request string, kind entities.KindBucket) (bool, error) {
+	hash := entities.NewHash(kind, request)
+	bucket, err :=b.GetBucketByHash(hash)
+	if bucket == nil {
+		bucket, err = b.CreateBucket(hash)
+		if err != nil {
+			return false, err
+		}
+	}
+	status, err := b.CheckBucket(bucket)
+	return status, err
 }

@@ -10,17 +10,14 @@ import (
 // ConnectorUseCase interface to interaction between use cases
 type ConnectorUseCase interface {
 	CheckRequest(request *entities.Request) (bool, error)
-	CheckOnceBucket(request string, kind entities.KindBucket) (bool, error)
 }
-
+// SubnetChecker check if net is black or white list
 type SubnetChecker interface {
 	CheckSubnet(ctx context.Context, ip *net.IPNet) (entities.IPKind, error)
 }
-
+// BucketsChecker checking bucket or creating if not exist
 type BucketsChecker interface {
-	GetBucketByHash(hash *entities.Hash) (*entities.Bucket, error)
-	CreateBucket(hash *entities.Hash) (*entities.Bucket, error)
-	CheckBucket(bucket *entities.Bucket) (bool, error)
+	CheckOrCreateBucket(request string, kind entities.KindBucket) (bool, error)
 }
 
 // Connector interaction between use cases
@@ -52,7 +49,6 @@ func (i *Connector) CheckRequest(request *entities.Request) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-
 	switch kind {
 	case entities.Black:
 		return false, nil
@@ -60,15 +56,15 @@ func (i *Connector) CheckRequest(request *entities.Request) (bool, error) {
 		return true, nil
 	}
 
-	IPStatus, err := i.CheckOnceBucket(request.IP, entities.IP)
+	IPStatus, err := i.Bucket.CheckOrCreateBucket(request.IP, entities.IP)
 	if err != nil {
 		return false, err
 	}
-	loginStatus, err := i.CheckOnceBucket(request.Login, entities.Login)
+	loginStatus, err := i.Bucket.CheckOrCreateBucket(request.Login, entities.Login)
 	if err != nil {
 		return false, err
 	}
-	passwordStatus, err := i.CheckOnceBucket(request.Password, entities.Password)
+	passwordStatus, err :=  i.Bucket.CheckOrCreateBucket(request.Password, entities.Password)
 	if err != nil {
 		return false, err
 	}
@@ -76,16 +72,4 @@ func (i *Connector) CheckRequest(request *entities.Request) (bool, error) {
 	return status, nil
 }
 
-// CheckOnceBucket check once bucket may be password, login, ip
-func (i *Connector) CheckOnceBucket(request string, kind entities.KindBucket) (bool, error) {
-	hash := entities.NewHash(kind, request)
-	bucket, err := i.Bucket.GetBucketByHash(hash)
-	if bucket == nil {
-		bucket, err = i.Bucket.CreateBucket(hash)
-		if err != nil {
-			return false, err
-		}
-	}
-	status, err := i.Bucket.CheckBucket(bucket)
-	return status, err
-}
+

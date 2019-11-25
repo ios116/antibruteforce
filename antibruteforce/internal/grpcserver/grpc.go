@@ -68,7 +68,7 @@ func (r *RPCServer) ResetBucket(ctx context.Context, in *ResetBucketRequest) (*S
 	case BucketKind_PASSWORD:
 		kind = entities.Password
 	}
-	hash := &entities.Hash{
+	hash := entities.Hash{
 		Kind: kind,
 		Key:  in.Key,
 	}

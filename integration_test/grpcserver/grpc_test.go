@@ -82,12 +82,15 @@ func TestGrpc(t *testing.T) {
 			Password: "123456",
 			Ip:       "91.245.34.189",
 		}
-		status, err := server.Check(ctx, req)
-		if err != nil {
-			t.Fatal(err)
-		}
-		if !status.Ok {
-			t.Fatal("status should be true but get false")
+		for i:=0; i<1100; i++ {
+			status, err := server.Check(ctx, req)
+			t.Log("===> ",i,status, err)
+			//if err != nil {
+			//	t.Fatal(err)
+			//}
+			//if !status.Ok {
+			//	t.Fatal("status should be true but get false")
+			//}
 		}
 	})
 }

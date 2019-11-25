@@ -12,7 +12,7 @@ services:
       LOGIN_LIMIT: 10
       PASSWORD_LIMIT: 100
       IP_LIMIT: 1000
-      DURATION: 60
+      DURATION: 10
       BUILD: dev
       GRPC_PORT: 50051
       GRPC_HOST: 0.0.0.0

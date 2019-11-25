@@ -14,8 +14,8 @@ import (
 	"go.uber.org/zap"
 )
 
-func bucketService(store *bucketstore.BucketStore, settings *config.Settings) *bucketusecase.BucketService {
-	return bucketusecase.NewBucketService(store, settings)
+func bucketService(store *bucketstore.BucketStore, settings *config.Settings, logger *zap.Logger) *bucketusecase.BucketService {
+	return bucketusecase.NewBucketService(store, settings, logger)
 }
 
 func ipService(settings *config.Settings, IPStore *ipstore.DbRepo) *ipusecase.IPService {
@@ -26,7 +26,7 @@ func ineractor(ipService *ipusecase.IPService, bucketService *bucketusecase.Buck
 	return interactor.NewConnector(ipService, bucketService)
 }
 
-func grpc(conf *config.GrpcConf, logger *zap.Logger, IPService *ipusecase.IPService, bucketService *bucketusecase.BucketService, integratorService *interactor.Connector) *grpcserver.RPCServer {
+func grpcCast(conf *config.GrpcConf, logger *zap.Logger, IPService *ipusecase.IPService, bucketService *bucketusecase.BucketService, integratorService *interactor.Connector) *grpcserver.RPCServer {
 	return grpcserver.NewRPCServer(conf, logger, IPService, bucketService, integratorService)
 }
 
@@ -58,7 +58,6 @@ func BuildContainer() *dig.Container {
 	// create bucket store
 	if err := container.Provide(bucketstore.NewBucketStore); err != nil {
 		log.Println(err)
-
 	}
 
 	// create new bucket service
@@ -77,7 +76,7 @@ func BuildContainer() *dig.Container {
 	}
 
 	// create grpc server
-	if err := container.Provide(grpc); err != nil {
+	if err := container.Provide(grpcCast); err != nil {
 		log.Println(err)
 	}
 

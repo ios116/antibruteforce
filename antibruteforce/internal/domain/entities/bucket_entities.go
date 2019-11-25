@@ -1,6 +1,7 @@
 package entities
 
 import (
+	"antibruteforce/internal/domain/exceptions"
 	"time"
 )
 
@@ -10,8 +11,8 @@ type KindBucket string
 // Login, Password, IP type of buckets
 const (
 	Login    KindBucket = "login"
-	Password            = "password"
-	IP                  = "ip"
+	Password KindBucket = "password"
+	IP       KindBucket = "ip"
 )
 
 // Hash is used as а key for the buckets. Includes key and type (login or password or ip)
@@ -20,16 +21,28 @@ type Hash struct {
 	Key  string
 }
 
+func (h Hash) Validation() error {
+	if h.Kind == "" {
+		return exceptions.KindRequired
+	}
+
+	if h.Key == "" {
+		return exceptions.KeyRequired
+	}
+
+	return nil
+}
+
 // NewHash created instance of key
-func NewHash(kind KindBucket, key string) *Hash {
-	return &Hash{Kind: kind, Key: key}
+func NewHash(kind KindBucket, key string) Hash {
+	return Hash{Kind: kind, Key: key}
 }
 
 // BucketStoreManager bucket store interface
 type BucketStoreManager interface {
-	Add(key *Hash, bucket *Bucket) error
-	Delete(hash *Hash) error
-	Get(key *Hash) (*Bucket, error)
+	Add(key Hash, bucket *Bucket) error
+	Delete(hash Hash) error
+	Get(key Hash) (*Bucket, error)
 	TotalBuckets() int
 }
 
@@ -39,8 +52,8 @@ type Bucket struct {
 	Duration time.Duration
 }
 
-// NewBucket bucket instance with a callback chanel. The chanel send message for delete bucket from storage
-func NewBucket(marker int, duration time.Duration, hash *Hash, callback chan *Hash) *Bucket {
+// NewBucket bucket instance with a callback chanel. The chanel send message for delete bucket from storage.
+func NewBucket(marker int, duration time.Duration, hash Hash, callback chan Hash) *Bucket {
 	time.AfterFunc(duration, func() {
 		callback <- hash
 	})
