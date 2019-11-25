@@ -15,6 +15,18 @@ type ConnectorUseCase interface {
 	CheckOnceBucket(request string, kind entities.KindBucket) (bool, error)
 }
 
+type SubnetChecker interface {
+	GetSubnet(ctx context.Context, subnet string) ([]*entities.IPListRow, error)
+}
+
+type BucketsChecker interface {
+	GetBucketByHash(hash *entities.Hash) (*entities.Bucket, error)
+	CreateBucket(hash *entities.Hash) (*entities.Bucket, error)
+	CheckBucket(bucket *entities.Bucket) (bool, error)
+}
+
+
+
 // Connector interaction between use cases
 type Connector struct {
 	IP     ipusecase.IPUseCase
