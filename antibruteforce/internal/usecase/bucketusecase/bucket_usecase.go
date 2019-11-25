@@ -79,7 +79,7 @@ func (b *BucketService) CheckBucket(bucket *entities.Bucket) (bool, error) {
 		return false, fmt.Errorf("CheckBucket: %w", exceptions.NilValue)
 	}
 	if !bucket.Counter() {
-		return false, exceptions.LimitReached
+		return false, fmt.Errorf("CheckBucket: %w", exceptions.LimitReached)
 	}
 	return true, nil
 }
@@ -117,9 +117,12 @@ func (b *BucketService) CheckOrCreateBucket(request string, kind entities.KindBu
 	if bucket == nil {
 		bucket, err = b.CreateBucket(hash)
 		if err != nil {
-			return false, err
+			return false, fmt.Errorf("CheckOrCreateBucket: %w", err)
 		}
 	}
 	status, err := b.CheckBucket(bucket)
-	return status, err
+	if err !=nil {
+		return false, fmt.Errorf("CheckOrCreateBucket: %w", err)
+	}
+	return status, nil
 }

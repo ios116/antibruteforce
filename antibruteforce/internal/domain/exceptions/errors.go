@@ -15,7 +15,7 @@ const (
 	KindRequired      = DomainError("Bucket Hash is required")
 	TypeNotFound     = DomainError("Type not found")
 	ObjectNoteFound  = DomainError("Object not found")
-	IPRequired       = DomainError("Ip address is required")
+	IPRequired       = DomainError("Ip address is not correct")
 	LoginRequired    = DomainError("Login address is required")
 	PasswordRequired = DomainError("Password address is required")
 	LimitReached     = DomainError("Request limit has been reached")

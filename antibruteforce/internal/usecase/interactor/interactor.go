@@ -56,20 +56,21 @@ func (i *Connector) CheckRequest(request *entities.Request) (bool, error) {
 		return true, nil
 	}
 
+    var mainErr error
 	IPStatus, err := i.Bucket.CheckOrCreateBucket(request.IP, entities.IP)
 	if err != nil {
-		return false, err
+		mainErr = err
 	}
 	loginStatus, err := i.Bucket.CheckOrCreateBucket(request.Login, entities.Login)
 	if err != nil {
-		return false, err
+		mainErr = err
 	}
 	passwordStatus, err :=  i.Bucket.CheckOrCreateBucket(request.Password, entities.Password)
 	if err != nil {
-		return false, err
+		mainErr = err
 	}
 	status := IPStatus && loginStatus && passwordStatus
-	return status, nil
+	return status, mainErr
 }
 
 

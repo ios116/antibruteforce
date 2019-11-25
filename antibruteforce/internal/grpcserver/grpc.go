@@ -129,5 +129,5 @@ func (r *RPCServer) GetSubnet(ctx context.Context, in *GetSubnetRequest) (*GetSu
 	}
 	return &GetSubnetResponse{
 		Nets: nets,
-	}, nil
+	},
 }

@@ -76,21 +76,39 @@ func TestGrpc(t *testing.T) {
 		}
 	})
 
-	t.Run("Check request", func(t *testing.T) {
+	t.Run("Check brute by Login", func(t *testing.T) {
 		req := &CheckRequest{
 			Login:    "Admin",
 			Password: "123456",
 			Ip:       "91.245.34.189",
 		}
-		for i:=0; i<1100; i++ {
+
+		t.Log("10 request for login per 60sec")
+		for i := 0; i < 11; i++ {
 			status, err := server.Check(ctx, req)
-			t.Log("===> ",i,status, err)
-			//if err != nil {
-			//	t.Fatal(err)
-			//}
-			//if !status.Ok {
-			//	t.Fatal("status should be true but get false")
+			t.Log("i=",i, status, err)
+			//if i == 11 && status == nil  {
+			//	t.Fatalf("Login - %s should be rejected ", req.Login )
 			//}
 		}
 	})
+
+	//t.Run("Check brute by IP", func(t *testing.T) {
+	//
+	//	t.Log("1001 request for ip per 60sec")
+	//	for i := 0; i < 1001; i++ {
+	//		login := fmt.Sprintf("Login-%d", i)
+	//		password := fmt.Sprintf("Password-%d", i)
+	//		req := &CheckRequest{
+	//			Login:    login,
+	//			Password: password,
+	//			Ip:       "91.245.34.12",
+	//		}
+	//		status, _ := server.Check(ctx, req)
+	//		if i == 1001 && status == nil {
+	//			t.Fatalf("Login - %s should be rejected ", req.Login )
+	//		}
+	//	}
+	//})
+
 }
