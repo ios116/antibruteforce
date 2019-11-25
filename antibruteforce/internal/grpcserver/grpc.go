@@ -97,7 +97,6 @@ func (r *RPCServer) AddIP(ctx context.Context, in *AddIpRequest) (*StatusRespons
 	return &StatusResponse{Ok: err == nil}, err
 }
 
-
 // DeleteIP delete ip from list
 func (r *RPCServer) DeleteIP(ctx context.Context, in *DeleteIpRequest) (*StatusResponse, error) {
 	_, netIP, err := net.ParseCIDR(in.Net)
@@ -107,7 +106,6 @@ func (r *RPCServer) DeleteIP(ctx context.Context, in *DeleteIpRequest) (*StatusR
 	err = r.IPService.DeleteNet(ctx, netIP)
 	return &StatusResponse{Ok: err == nil}, err
 }
-
 
 // GetSubnet get all subnet by net
 func (r *RPCServer) GetSubnet(ctx context.Context, in *GetSubnetRequest) (*GetSubnetResponse, error) {

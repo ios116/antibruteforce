@@ -2,11 +2,14 @@ package config
 
 import (
 	"fmt"
+	"log"
+
 	"github.com/caarlos0/env/v6"
+
+	// postgres config
 	_ "github.com/jackc/pgx"
 	_ "github.com/jackc/pgx/stdlib"
 	"github.com/jmoiron/sqlx"
-	"log"
 )
 
 // DateBaseConf config

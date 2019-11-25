@@ -60,7 +60,7 @@ func (b *IPService) CheckSubnet(ctx context.Context, ip *net.IPNet) (entities.IP
 		return res[0].Kind, nil
 	}
 }
-
+// GetSubnet get subnet
 func (b *IPService) GetSubnet(ctx context.Context, subnet string) ([]*entities.IPListRow, error) {
 	_, ipNet, err := net.ParseCIDR(subnet)
 	if err != nil {
