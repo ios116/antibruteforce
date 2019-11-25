@@ -27,6 +27,7 @@ func TestGrpc(t *testing.T) {
 	conf := config.NewGrpcConf()
 	address := fmt.Sprintf("%s:%d", conf.GrpcHost, conf.GrpcPort)
 	conn, err := grpc.Dial(address, option, grpc.WithInsecure())
+	settings := config.NewSettings()
 	t.Log(address)
 	if err != nil {
 		t.Fatal("Can't connect to GRPC: ", address)
@@ -35,68 +36,75 @@ func TestGrpc(t *testing.T) {
 	server := NewAntiBruteForceClient(conn)
 	ctx := context.Background()
 
-	t.Run("Add IP", func(t *testing.T) {
-		req := &AddIpRequest{
-			Net:  "127.0.0.1/32",
-			List: List_BLACK,
-		}
-		status, err := server.AddIP(ctx, req)
-		if err != nil {
-			t.Fatal(err)
-		}
-		if !status.Ok {
-			t.Fatal("status should by true")
-		}
-	})
-
-	t.Run("Get subnet", func(t *testing.T) {
-		req := &GetSubnetRequest{
-			Net: "127.0.0.1/32",
-		}
-		resp, err := server.GetSubnet(ctx, req)
-		if err != nil {
-			t.Fatal(err)
-		}
-		if len(resp.Nets) == 0 {
-			t.Fatal("nets should be 1")
-		}
-		t.Log(resp.Nets[0].Net, resp.Nets[0].List)
-	})
-
-	t.Run("Delete ip", func(t *testing.T) {
-		req := &DeleteIpRequest{
-			Net: "127.0.0.1/32",
-		}
-		status, err := server.DeleteIP(ctx, req)
-		if err != nil {
-			t.Fatal(err)
-		}
-		if !status.Ok {
-			t.Fatal("status should by true")
-		}
-	})
-
-	t.Run("Check brute by Login", func(t *testing.T) {
+	t.Run("Check Login", func(t *testing.T) {
 		req := &CheckRequest{
 			Login:    "Admin",
 			Password: "123456",
 			Ip:       "91.245.34.189",
 		}
-
-		t.Log("10 request for login per 60sec")
-		for i := 0; i < 11; i++ {
+		t.Logf("%d request for login per %ds", settings.LoginLimit+1, settings.Duration)
+		for i := 0; i < settings.LoginLimit+1; i++ {
 			status, err := server.Check(ctx, req)
-			t.Log("i=",i, status, err)
-			//if i == 11 && status == nil  {
-			//	t.Fatalf("Login - %s should be rejected ", req.Login )
-			//}
+			t.Log(status, err)
+			if i == settings.LoginLimit && err == nil && status != nil {
+				t.Fatalf("Login - %s should be rejected ", req.Login)
+			}
 		}
 	})
 
-	//t.Run("Check brute by IP", func(t *testing.T) {
+	//t.Run("Added ip 91.245.34.189 to white list and test by login", func(t *testing.T) {
+	//	ipToWhiteList := &AddIpRequest{
+	//		Net:  "91.245.34.189/32",
+	//		List: List_WHITE,
+	//	}
+	//	_, err := server.AddIP(ctx, ipToWhiteList)
+	//	if err != nil {
+	//		t.Fatal(err)
+	//	}
+	//	req := &CheckRequest{
+	//		Login:    "Admin",
+	//		Password: "123456",
+	//		Ip:       "91.245.34.189",
+	//	}
+	//	t.Logf("%d request for login per %ds", settings.LoginLimit+1, settings.Duration)
+	//	for i := 0; i < settings.LoginLimit+1; i++ {
+	//		status, err := server.Check(ctx, req)
+	//		if  err != nil || status == nil {
+	//			t.Fatalf("Login - %s should be rejected ", req.Login)
+	//		}
+	//	}
+	//})
 	//
-	//	t.Log("1001 request for ip per 60sec")
-	//	for i := 0; i < 1001; i++ {
+	//t.Run("Get subnet", func(t *testing.T) {
+	//	req := &GetSubnetRequest{
+	//		Net: "91.245.34.189/32",
+	//	}
+	//	resp, err := server.GetSubnet(ctx, req)
+	//	if err != nil {
+	//		t.Fatal(err)
+	//	}
+	//	if len(resp.Nets) == 0 {
+	//		t.Fatal("nets should be 1")
+	//	}
+	//	t.Log(resp.Nets[0].Net, resp.Nets[0].List)
+	//})
+	//
+	//t.Run("Delete subnet", func(t *testing.T) {
+	//	req := &DeleteIpRequest{
+	//		Net: "91.245.34.189/32",
+	//	}
+	//	status, err := server.DeleteIP(ctx, req)
+	//	if err != nil {
+	//		t.Fatal(err)
+	//	}
+	//	if !status.Ok {
+	//		t.Fatal("status should by true")
+	//	}
+	//})
+	//
+	//t.Run("Check brute by IP", func(t *testing.T) {
+	//	t.Logf("%d request for login per %ds", settings.IPLimit+1, settings.Duration)
+	//	for i := 0; i < settings.LoginLimit+1; i++ {
 	//		login := fmt.Sprintf("Login-%d", i)
 	//		password := fmt.Sprintf("Password-%d", i)
 	//		req := &CheckRequest{
@@ -105,10 +113,9 @@ func TestGrpc(t *testing.T) {
 	//			Ip:       "91.245.34.12",
 	//		}
 	//		status, _ := server.Check(ctx, req)
-	//		if i == 1001 && status == nil {
-	//			t.Fatalf("Login - %s should be rejected ", req.Login )
+	//		if i == settings.IPLimit && err == nil && status != nil {
+	//			t.Fatalf("IP - %s should be rejected ", req.Ip)
 	//		}
 	//	}
 	//})
-
 }

@@ -45,9 +45,11 @@ var grpcClient = &cobra.Command{
 				Password: "123456",
 				Ip:       "91.245.34.189",
 			}
-			for i:=0; i<10; i++ {
+			for i:=0; i<12; i++ {
 				status, err := server.Check(ctx, req)
-				log.Println("===> ",i,status, err)
+				if i ==10 && err != nil {
+					log.Println("===> ",i,status, err)
+				}
 			}
 		})
 		if err != nil {
