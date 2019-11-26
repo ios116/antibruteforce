@@ -3,10 +3,10 @@ make up
 ### Запустить интеграционные тесты
 make test 
 ### Сli
-Usage:
-  ./abf [command]
+```Usage:
+./abf [command]
 
-```Available Commands:
+Available Commands:
 
   add         Command for adding ip to the blacklist or whitelist
   bucket      Command resets bucket by login or ip
