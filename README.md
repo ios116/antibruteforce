@@ -22,10 +22,11 @@ Flags:
 Use "./abf [command] --help" for more information about a command.
 ```
 
-*комментарий:*
+*Комментарий:*
 
 Хранилище для bucket-ов реализовано в памяти. При создании bucket-а создается канал покоторому через timeout посылается сообщение [коллектору](https://github.com/ios116/antibruteforce/blob/ed0bba00f85f29acebe7a658a1b8fe58b86146f7/antibruteforce/internal/usecase/bucketusecase/bucket_usecase.go#L102) на удаление из памяти.
 
+Проект содержит unit тесты
 
 # ТЗ на сервис "Анти-брутфорс".
 
