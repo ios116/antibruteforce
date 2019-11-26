@@ -21,6 +21,7 @@ type Hash struct {
 	Key  string
 }
 
+// Validation validation hash
 func (h Hash) Validation() error {
 	if h.Kind == "" {
 		return exceptions.KindRequired

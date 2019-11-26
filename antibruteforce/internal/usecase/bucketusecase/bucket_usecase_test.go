@@ -4,10 +4,11 @@ import (
 	"antibruteforce/internal/config"
 	"antibruteforce/internal/domain/entities"
 	"antibruteforce/internal/store/bucketstore"
-	"go.uber.org/zap"
 	"os"
 	"testing"
 	"time"
+
+	"go.uber.org/zap"
 
 	"github.com/stretchr/testify/mock"
 )
@@ -120,14 +121,14 @@ func TestMem(t *testing.T) {
 			Kind: request.kind,
 			Key:  request.key,
 		}
-		_, err:= bucketService.CreateBucket(hash)
-		if err !=nil {
+		_, err := bucketService.CreateBucket(hash)
+		if err != nil {
 			t.Fatal(err)
 		}
 	}
 	t.Log("Total=", bucketService.TotalBuckets())
 	time.Sleep(5 * time.Second)
-	if total :=  bucketService.TotalBuckets(); total !=0 {
+	if total := bucketService.TotalBuckets(); total != 0 {
 		t.Logf("bucket collector not working Total=%d should be 0", total)
 	}
 

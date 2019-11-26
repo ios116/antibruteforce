@@ -3,9 +3,10 @@ package interactor
 import (
 	"antibruteforce/internal/domain/entities"
 	"context"
-	"github.com/stretchr/testify/mock"
 	"net"
 	"testing"
+
+	"github.com/stretchr/testify/mock"
 )
 
 type MockedSubnetChecker struct {
@@ -21,7 +22,7 @@ type MockedBucketsChecker struct {
 	mock.Mock
 }
 
-func (s *MockedBucketsChecker) CheckOrCreateBucket(request string, kind entities.KindBucket) (bool, error){
+func (s *MockedBucketsChecker) CheckOrCreateBucket(request string, kind entities.KindBucket) (bool, error) {
 	args := s.Called(request, kind)
 	return args.Bool(0), args.Error(1)
 }
@@ -32,13 +33,13 @@ func TestConnector(t *testing.T) {
 
 	dataSet := []struct {
 		request *entities.Request
-		ok  bool
+		ok      bool
 		err     error
 		IPKind  entities.IPKind
 	}{
 		{request: &entities.Request{IP: "127.0.0.1", Login: "admin1", Password: "1"}, ok: true, err: nil, IPKind: entities.White},  // if ip in white list
 		{request: &entities.Request{IP: "127.0.0.2", Login: "admin2", Password: "2"}, ok: false, err: nil, IPKind: entities.Black}, // if ip in black list
-	    {request: &entities.Request{IP: "127.0.0.3", Login: "admin3", Password: "3"}, ok: true, err: nil, IPKind: ""},              // if ip in not list
+		{request: &entities.Request{IP: "127.0.0.3", Login: "admin3", Password: "3"}, ok: true, err: nil, IPKind: ""},              // if ip in not list
 	}
 	ctx := context.Background()
 	for _, item := range dataSet {

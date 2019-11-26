@@ -5,8 +5,9 @@ import (
 	"antibruteforce/internal/grpcserver"
 	"context"
 	"fmt"
-	"github.com/spf13/cobra"
 	"log"
+
+	"github.com/spf13/cobra"
 )
 
 var bucketCmd = &cobra.Command{
@@ -26,26 +27,26 @@ var bucketCmd = &cobra.Command{
 			var typOfBucket grpcserver.BucketKind
 			var key string
 			if ip != "" {
-                typOfBucket = grpcserver.BucketKind_IP
-                key = ip
+				typOfBucket = grpcserver.BucketKind_IP
+				key = ip
 			}
 			if login != "" {
 				typOfBucket = grpcserver.BucketKind_LOGIN
-                key = login
+				key = login
 			}
-			if ip == "" && login =="" {
+			if ip == "" && login == "" {
 				fmt.Println("ip or login required")
 				return
 			}
-			req:=&grpcserver.ResetBucketRequest{
-				Kind:                 typOfBucket,
-				Key:                  key,
+			req := &grpcserver.ResetBucketRequest{
+				Kind: typOfBucket,
+				Key:  key,
 			}
 			status, err := server.ResetBucket(ctx, req)
 			if err != nil {
 				log.Fatal(err)
 			}
-			fmt.Printf("%s was reset status: %t \n",key, status.Ok)
+			fmt.Printf("%s was reset status: %t \n", key, status.Ok)
 			return
 		})
 		if err != nil {

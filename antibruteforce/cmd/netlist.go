@@ -5,8 +5,9 @@ import (
 	"antibruteforce/internal/grpcserver"
 	"context"
 	"fmt"
-	"github.com/spf13/cobra"
 	"log"
+
+	"github.com/spf13/cobra"
 )
 
 var addCmd = &cobra.Command{

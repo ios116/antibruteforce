@@ -1,5 +1,5 @@
 up:
-	docker-compose up -d
+	docker-compose up  --build -d
 psql:
 	docker exec -it postgres psql -U postgres -d force
 test:

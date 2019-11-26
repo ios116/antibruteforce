@@ -1,3 +1,35 @@
+### запустить проект
+make up
+### запустить интеграционные тесты
+make test 
+### cli
+Usage:
+  ./abf [command]
+
+Available Commands:
+
+  add         Command for adding ip to the blacklist or whitelist
+  
+  bucket      Command resets bucket by login or ip
+  
+  delete      The command removes ip from the list
+  
+  grpc        Command to start grpc server
+  
+  help        Help about any command
+
+Flags:
+
+  -h, --help         help for ./abf
+  
+  -n, --net string   ip with mask example 127.0.0.0/24
+  
+Use "./abf [command] --help" for more information about a command.
+
+### комментарий
+Хранилище для bucket-ов реализовано в памяти. При создании bucket-а создается канал покоторому через timeout посылается сообщение коллектору на удаление из памяти
+
+
 # ТЗ на сервис "Анти-брутфорс".
 
 ## Общее описание проекта

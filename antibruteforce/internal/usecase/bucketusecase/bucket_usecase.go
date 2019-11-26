@@ -5,8 +5,9 @@ import (
 	"antibruteforce/internal/domain/entities"
 	"antibruteforce/internal/domain/exceptions"
 	"fmt"
-	"go.uber.org/zap"
 	"time"
+
+	"go.uber.org/zap"
 )
 
 // BucketsUseCase интерфейс позводляющий проверить наличие свободных маркеров и удалить устаревший bucket
@@ -32,7 +33,7 @@ type BucketService struct {
 // NewBucketService создание экземпляра buckets
 func NewBucketService(store entities.BucketStoreManager, settings *config.Settings, logger *zap.Logger) *BucketService {
 	callback := make(chan entities.Hash)
-	return &BucketService{BucketStore: store, Settings: settings, Callback: callback, Logger:logger}
+	return &BucketService{BucketStore: store, Settings: settings, Callback: callback, Logger: logger}
 }
 
 // GetBucketByHash get bucket by hash
@@ -106,14 +107,14 @@ func (b *BucketService) BucketCollector() {
 			err = fmt.Errorf("bucket collector: %w", err)
 			b.Logger.Error(err.Error())
 		}
-		b.Logger.Info("bucket was deleted", zap.String("hash",hash.Key))
+		b.Logger.Info("bucket was deleted", zap.String("hash", hash.Key))
 	}
 }
 
-// CheckOnceBucket check once bucket may be password, login, ip
+// CheckOrCreateBucket check once bucket may be password, login, ip
 func (b *BucketService) CheckOrCreateBucket(request string, kind entities.KindBucket) (bool, error) {
 	hash := entities.NewHash(kind, request)
-	bucket, err :=b.GetBucketByHash(hash)
+	bucket, err := b.GetBucketByHash(hash)
 	if bucket == nil {
 		bucket, err = b.CreateBucket(hash)
 		if err != nil {
@@ -121,7 +122,7 @@ func (b *BucketService) CheckOrCreateBucket(request string, kind entities.KindBu
 		}
 	}
 	status, err := b.CheckBucket(bucket)
-	if err !=nil {
+	if err != nil {
 		return false, fmt.Errorf("CheckOrCreateBucket: %w", err)
 	}
 	return status, nil

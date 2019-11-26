@@ -10,7 +10,7 @@ services:
       POSTGRES_PASSWORD: 123456
       POSTGRES_USER: postgres
       POSTGRES_DB: force
-      POSTGRES_HOST: db
+      POSTGRES_HOST: db.test
       LOGIN_LIMIT: 10
       PASSWORD_LIMIT: 100
       IP_LIMIT: 1000
@@ -19,9 +19,9 @@ services:
       GRPC_PORT: 50051
       GRPC_HOST: 0.0.0.0
       GRPC_TOKEN: secret
-    command:  sh -c './wait-for.sh db:5432 -- ./abf grpc'
+    command:  sh -c './wait-for.sh db.test:5432 -- ./abf grpc'
     depends_on:
-      - db
+      - db.test
     restart: on-failure
     networks:
       - net
@@ -35,13 +35,13 @@ services:
       PASSWORD_LIMIT: 15
       IP_LIMIT: 20
     depends_on:
-      - db
+      - db.test
       - abf.com
     command: "true"
     networks:
       - net
 
-  db:
+  db.test:
     image: postgres:11.2
     container_name: postgres_test
     environment:

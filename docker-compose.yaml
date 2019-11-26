@@ -2,7 +2,9 @@ version: '3'
 services:
 
   abf:
-    image: ab:1.0
+    build:
+      context: ./antibruteforce
+      dockerfile: Dockerfile
     container_name: ab
     environment:
       POSTGRES_PASSWORD: 123456
