@@ -2,6 +2,7 @@ version: '3'
 services:
 
   abf.com:
+    image: abf_test:1.0
     build:
       context: ./antibruteforce
       dockerfile: Dockerfile.multistage
@@ -27,6 +28,7 @@ services:
       - net
 
   integration_test:
+    image: abf_integration:1.0
     build: ./integration_test
     environment:
       GRPC_PORT: 50051

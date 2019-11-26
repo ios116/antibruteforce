@@ -7,6 +7,7 @@ import (
 	"google.golang.org/grpc"
 	"integration_test/config"
 	"integration_test/grpcserver"
+	"log"
 )
 
 type rpc struct {
@@ -15,12 +16,10 @@ type rpc struct {
 	ip       string
 	response string
 	config   *config.GrpcConf
+	cc       *grpc.ClientConn
 }
 
-func (r *rpc) grpcConnection() (*grpc.ClientConn, error) {
-	conn, err := grpcserver.NewGrpcConnection(r.config)
-	return conn, err
-}
+
 
 func (r *rpc) requestSet(arg1, arg2, arg3 string) error {
 	r.login = arg1
@@ -30,18 +29,14 @@ func (r *rpc) requestSet(arg1, arg2, arg3 string) error {
 }
 
 func (r *rpc) checkRequestTimes(arg1 int) error {
-	conn, err := r.grpcConnection()
-	if err != nil {
-		return err
-	}
-	defer conn.Close()
+	server := grpcserver.NewAntiBruteForceClient(r.cc)
 	ctx := context.Background()
+
 	req := &grpcserver.CheckRequest{
 		Login:    r.login,
 		Password: r.pass,
 		Ip:       r.ip,
 	}
-	server := grpcserver.NewAntiBruteForceClient(conn)
 	for i := 0; i < arg1; i++ {
 		status, err := server.Check(ctx, req)
 		if err != nil && status == nil {
@@ -61,15 +56,8 @@ func (r *rpc) responseShouldBeMatch(arg1 string) error {
 }
 
 func (r *rpc) resetBucket(arg1, arg2 string) error {
-	//return godog.ErrPending
-	conf := config.NewGrpcConf()
-	conn, err := grpcserver.NewGrpcConnection(conf)
-	if err != nil {
-		return err
-	}
-	defer conn.Close()
+	server := grpcserver.NewAntiBruteForceClient(r.cc)
 	ctx := context.Background()
-	server := grpcserver.NewAntiBruteForceClient(conn)
 	req := new(grpcserver.ResetBucketRequest)
 	switch arg1 {
 	case "login":
@@ -92,14 +80,8 @@ func (r *rpc) resetBucket(arg1, arg2 string) error {
 }
 
 func (r *rpc) addIpToList(arg1, arg2 string) error {
-	conf := config.NewGrpcConf()
-	conn, err := grpcserver.NewGrpcConnection(conf)
-	if err != nil {
-		return err
-	}
-	defer conn.Close()
+	server := grpcserver.NewAntiBruteForceClient(r.cc)
 	ctx := context.Background()
-	server := grpcserver.NewAntiBruteForceClient(conn)
 	var kind grpcserver.List
 	switch arg2 {
 
@@ -123,16 +105,10 @@ func (r *rpc) addIpToList(arg1, arg2 string) error {
 }
 
 func (r *rpc) removeIpFromList(arg1 string) error {
-	conf := config.NewGrpcConf()
-	conn, err := grpcserver.NewGrpcConnection(conf)
-	if err != nil {
-		return err
-	}
-	defer conn.Close()
+	server := grpcserver.NewAntiBruteForceClient(r.cc)
 	ctx := context.Background()
-	server := grpcserver.NewAntiBruteForceClient(conn)
 	req := &grpcserver.DeleteIpRequest{Net: arg1}
-	_, err = server.DeleteIP(ctx, req)
+	_, err := server.DeleteIP(ctx, req)
 	if err != nil {
 		r.response = "false"
 		return err
@@ -143,11 +119,25 @@ func (r *rpc) removeIpFromList(arg1 string) error {
 
 func FeatureContext(s *godog.Suite) {
 	test := new(rpc)
-	test.config = config.NewGrpcConf()
+
+	s.BeforeScenario(func(i interface{}) {
+		test.config = config.NewGrpcConf()
+		conn, err := grpcserver.NewGrpcConnection(config.NewGrpcConf())
+		test.cc = conn
+		if err != nil {
+			log.Fatal(err)
+		}
+	})
+
 	s.Step(`^request set "([^"]*)", "([^"]*)", "([^"]*)"$`, test.requestSet)
 	s.Step(`^check request (\d+) times$`, test.checkRequestTimes)
 	s.Step(`^response should be match "([^"]*)"$`, test.responseShouldBeMatch)
 	s.Step(`^reset Bucket "([^"]*)", "([^"]*)"$`, test.resetBucket)
 	s.Step(`^add ip "([^"]*)" to list "([^"]*)"$`, test.addIpToList)
 	s.Step(`^remove ip "([^"]*)" from list$`, test.removeIpFromList)
+
+	s.AfterScenario(func(i interface{}, e error) {
+		test.cc.Close()
+	})
+
 }
