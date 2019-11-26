@@ -33,6 +33,7 @@ services:
 
   db:
     image: postgres:11.6
+    container_name: postgres
     environment:
       POSTGRES_PASSWORD: 123456
       POSTGRES_USER: postgres
