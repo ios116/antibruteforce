@@ -6,22 +6,18 @@ import (
 
 // RootCmd root command for DI
 var RootCmd = &cobra.Command{
-	Use:   "abf",
+	Use:   "./abf",
 	Short: "anti brut force",
 }
 
 var (
-	login, ip, ipNet string
+	login, ip, ipNet, listType  string
 )
 
 func init() {
-
-	RootCmd.AddCommand(blackList, whiteList, resetBucket, grpcRun)
-	// buckets management
-	resetBucket.Flags().StringVarP(&login, "login", "l", "", "bucket login")
-	resetBucket.Flags().StringVarP(&ip, "ip", "i", "", "bucket ip ")
-	whiteList.AddCommand(addWhiteList, deleteWhiteList)
-	blackList.AddCommand(addBlackList, deleteBlackList)
-	RootCmd.PersistentFlags().StringVarP(&ipNet, "net", "n", "", "action with net list maybe delete or add")
-
+	RootCmd.AddCommand(addCmd,deleteCmd, bucketCmd, grpcRun)
+	bucketCmd.Flags().StringVarP(&login, "login", "l", "", "bucket login")
+	bucketCmd.Flags().StringVarP(&ip, "ip", "i", "", "bucket ip ")
+	addCmd.Flags().StringVarP(&listType, "type", "t", "", "type of list may be white/black")
+	RootCmd.PersistentFlags().StringVarP(&ipNet, "net", "n", "", "ip with mask example 127.0.0.0/24")
 }

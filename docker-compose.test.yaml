@@ -12,8 +12,8 @@ services:
       POSTGRES_DB: force
       POSTGRES_HOST: db
       LOGIN_LIMIT: 10
-      PASSWORD_LIMIT: 15
-      IP_LIMIT: 20
+      PASSWORD_LIMIT: 100
+      IP_LIMIT: 1000
       DURATION: 60
       BUILD: dev
       GRPC_PORT: 50051

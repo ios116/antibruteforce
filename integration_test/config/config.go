@@ -1,9 +1,8 @@
 package config
 
 import (
-	"log"
 	"github.com/caarlos0/env/v6"
-
+	"log"
 )
 
 // Settings are used to set restrictions on LIMIT.
@@ -23,5 +22,3 @@ func NewSettings() *Settings {
 	}
 	return c
 }
-
-

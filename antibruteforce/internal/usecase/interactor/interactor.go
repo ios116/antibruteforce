@@ -11,10 +11,12 @@ import (
 type ConnectorUseCase interface {
 	CheckRequest(request *entities.Request) (bool, error)
 }
+
 // SubnetChecker check if net is black or white list
 type SubnetChecker interface {
 	CheckSubnet(ctx context.Context, ip *net.IPNet) (entities.IPKind, error)
 }
+
 // BucketsChecker checking bucket or creating if not exist
 type BucketsChecker interface {
 	CheckOrCreateBucket(request string, kind entities.KindBucket) (bool, error)
@@ -51,12 +53,12 @@ func (i *Connector) CheckRequest(request *entities.Request) (bool, error) {
 	}
 	switch kind {
 	case entities.Black:
-		return false, nil
+		return false, exceptions.IPInBlackList
 	case entities.White:
 		return true, nil
 	}
 
-    var mainErr error
+	var mainErr error
 	IPStatus, err := i.Bucket.CheckOrCreateBucket(request.IP, entities.IP)
 	if err != nil {
 		mainErr = err
@@ -65,12 +67,10 @@ func (i *Connector) CheckRequest(request *entities.Request) (bool, error) {
 	if err != nil {
 		mainErr = err
 	}
-	passwordStatus, err :=  i.Bucket.CheckOrCreateBucket(request.Password, entities.Password)
+	passwordStatus, err := i.Bucket.CheckOrCreateBucket(request.Password, entities.Password)
 	if err != nil {
 		mainErr = err
 	}
 	status := IPStatus && loginStatus && passwordStatus
 	return status, mainErr
 }
-
-

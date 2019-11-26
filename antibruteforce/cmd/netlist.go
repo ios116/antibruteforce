@@ -9,18 +9,47 @@ import (
 	"log"
 )
 
-var blackList = &cobra.Command{
-	Use:   "blacklist",
-	Short: "Command choice the blacklist",
-	Args:  cobra.MinimumNArgs(1),
+var addCmd = &cobra.Command{
+	Use:   "add",
+	Short: "Command for adding ip to the blacklist or whitelist",
+	//Args:  cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("blacklist= ", ipNet)
+		container := BuildContainer()
+		err := container.Invoke(func(conf *config.GrpcConf) {
+			conn, err := newGrpcConnection(conf)
+			defer conn.Close()
+			if err != nil {
+				log.Fatal(err)
+			}
+			server := grpcserver.NewAntiBruteForceClient(conn)
+			ctx := context.Background()
+			var typOfList grpcserver.List
+			switch listType {
+			case "white":
+				typOfList = grpcserver.List_WHITE
+			case "black":
+				typOfList = grpcserver.List_BLACK
+			default:
+				fmt.Println("type may by white or black")
+				return
+			}
+			req := &grpcserver.AddIpRequest{Net: ipNet, List: typOfList}
+			status, err := server.AddIP(ctx, req)
+			if err != nil {
+				log.Fatal(err)
+			}
+			fmt.Println(status.Ok)
+			return
+		})
+		if err != nil {
+			log.Fatal(err)
+		}
 	},
 }
 
-var deleteBlackList = &cobra.Command{
+var deleteCmd = &cobra.Command{
 	Use:   "delete",
-	Short: "The command removes ip from the blacklist",
+	Short: "The command removes ip from the list",
 	//	Args: cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		container := BuildContainer()
@@ -40,35 +69,9 @@ var deleteBlackList = &cobra.Command{
 				log.Fatal(err)
 			}
 			fmt.Println(status.Ok)
-
 		})
-		log.Fatal(err)
-	},
-}
-
-var addBlackList = &cobra.Command{
-	Use:   "add",
-	Short: "The command adds ip to the blacklist",
-	//	Args: cobra.MinimumNArgs(1),
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("add black list", ipNet)
-	},
-}
-
-var whiteList = &cobra.Command{
-	Use:   "whitelist",
-	Short: "Command choice the whitelist",
-	Args:  cobra.MinimumNArgs(1),
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("white=", ipNet)
-	},
-}
-
-var addWhiteList = &cobra.Command{
-	Use:   "add",
-	Short: "The command adds ip to whitelist",
-	//	Args: cobra.MinimumNArgs(1),
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("add white list", ipNet)
+		if err != nil {
+			log.Fatal(err)
+		}
 	},
 }
