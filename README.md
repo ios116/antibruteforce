@@ -6,20 +6,16 @@ make test
 Usage:
   ./abf [command]
 
-``Available Commands:
+```Available Commands:
 
   add         Command for adding ip to the blacklist or whitelist
   bucket      Command resets bucket by login or ip
   delete      The command removes ip from the list
-  
   grpc        Command to start grpc server
-  
   help        Help about any command
 
 Flags:
-
   -h, --help         help for ./abf
-  
   -n, --net string   ip with mask example 127.0.0.0/24
   
 Use "./abf [command] --help" for more information about a command.
