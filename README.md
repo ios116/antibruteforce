@@ -25,9 +25,8 @@ Use "./abf [command] --help" for more information about a command.
 
 *Комментарий:*
 
-Хранилище для bucket-ов реализовано в памяти. При создании bucket-а передается ссылка на [канал](https://github.com/ios116/antibruteforce/blob/c61903644a8402a02ac6cf1d876c3c237a05535d/antibruteforce/internal/domain/entities/bucket_entities.go#L57), покоторому по timeout(время жизни bucket-а) посылает сообщение [коллектору](https://github.com/ios116/antibruteforce/blob/ed0bba00f85f29acebe7a658a1b8fe58b86146f7/antibruteforce/internal/usecase/bucketusecase/bucket_usecase.go#L102) на удаление из памяти. Коллектор это горутина которая [запускается](https://github.com/ios116/antibruteforce/blob/9605f140d3b5fad2792b0ae1679fee58c06e8c04/antibruteforce/internal/grpcserver/grpc.go#L39) при запуске grpc сервера. У каждого bucket-а есть счетчик (проще говоря это кол-во запросов в ед. времени) при кадом запросе счетчик уменьшается на 1 и при достижении 0 запрос блокируется.  
-
-Помимо интеграционных тестов проек содержит unit тесты.
+* Хранилище для bucket-ов реализовано в памяти. При создании bucket-а передается ссылка на [канал](https://github.com/ios116/antibruteforce/blob/c61903644a8402a02ac6cf1d876c3c237a05535d/antibruteforce/internal/domain/entities/bucket_entities.go#L57), покоторому по timeout(время жизни bucket-а) посылает сообщение [коллектору](https://github.com/ios116/antibruteforce/blob/ed0bba00f85f29acebe7a658a1b8fe58b86146f7/antibruteforce/internal/usecase/bucketusecase/bucket_usecase.go#L102) на удаление из памяти. Коллектор это горутина которая [запускается](https://github.com/ios116/antibruteforce/blob/9605f140d3b5fad2792b0ae1679fee58c06e8c04/antibruteforce/internal/grpcserver/grpc.go#L39) при запуске grpc сервера. У каждого bucket-а есть счетчик (проще говоря это кол-во запросов в ед. времени) при кадом запросе счетчик уменьшается на 1 и при достижении 0 запрос блокируется.  
+* Помимо интеграционных тестов проек содержит unit тесты.
 
 # ТЗ на сервис "Анти-брутфорс".
 
