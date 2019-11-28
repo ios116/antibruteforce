@@ -92,14 +92,14 @@ var subnetCmd = &cobra.Command{
 			server := grpcserver.NewAntiBruteForceClient(conn)
 			ctx := context.Background()
 			subn := &grpcserver.GetSubnetRequest{
-				Net:                  ipNet,
+				Net: ipNet,
 			}
-			results, err := server.GetSubnet(ctx,subn)
+			results, err := server.GetSubnet(ctx, subn)
 			if err != nil {
 				log.Fatal(err)
 			}
-			for _, net := range results.Nets{
-			   fmt.Println(net.List, net.Net)
+			for _, net := range results.Nets {
+				fmt.Println(net.List, net.Net)
 			}
 		})
 		if err != nil {
