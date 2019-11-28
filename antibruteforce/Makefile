@@ -3,7 +3,7 @@ protogen:
 ipstore:
 	go test -v -count=1 antibruteforce/internal/store/ipstore
 mockgen:
-     mockgen -destination=./internal/usecase/ipusecase/mock_repo.go -package=ipusecase -source=./internal/domain/entities/ip_entities.go IPStoreManager
+	mockgen -destination=./internal/usecase/ipusecase/mock_repo.go -package=ipusecase -source=./internal/domain/entities/ip_entities.go IPStoreManager
 fmt:
 	gofmt -w -s -d .
 vet:
@@ -16,5 +16,7 @@ tidy:
 	go mod tidy
 verify:
 	go mod verify
-
 pre-commit: fmt vet lint tidy verify imports
+.PHONY: build
+build:
+	go build -o build/abf

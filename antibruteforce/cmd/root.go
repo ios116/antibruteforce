@@ -15,7 +15,7 @@ var (
 )
 
 func init() {
-	RootCmd.AddCommand(addCmd, deleteCmd, bucketCmd, grpcRun)
+	RootCmd.AddCommand(addCmd, deleteCmd, bucketCmd, grpcRun, subnetCmd)
 	bucketCmd.Flags().StringVarP(&login, "login", "l", "", "bucket login")
 	bucketCmd.Flags().StringVarP(&ip, "ip", "i", "", "bucket ip ")
 	addCmd.Flags().StringVarP(&listType, "type", "t", "", "type of list may be white/black")

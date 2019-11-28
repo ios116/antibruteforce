@@ -76,3 +76,34 @@ var deleteCmd = &cobra.Command{
 		}
 	},
 }
+
+var subnetCmd = &cobra.Command{
+	Use:   "subnet",
+	Short: "The command look up all subnet",
+	//	Args: cobra.MinimumNArgs(1),
+	Run: func(cmd *cobra.Command, args []string) {
+		container := BuildContainer()
+		err := container.Invoke(func(conf *config.GrpcConf) {
+			conn, err := newGrpcConnection(conf)
+			defer conn.Close()
+			if err != nil {
+				log.Fatal(err)
+			}
+			server := grpcserver.NewAntiBruteForceClient(conn)
+			ctx := context.Background()
+			subn := &grpcserver.GetSubnetRequest{
+				Net:                  ipNet,
+			}
+			results, err := server.GetSubnet(ctx,subn)
+			if err != nil {
+				log.Fatal(err)
+			}
+			for _, net := range results.Nets{
+			   fmt.Println(net.List, net.Net)
+			}
+		})
+		if err != nil {
+			log.Fatal(err)
+		}
+	},
+}
